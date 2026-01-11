@@ -1,7 +1,7 @@
 {
   "name": "transeki-desktop",
   "type": "module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Transeki is a feature-rich manga reader desktop application designed for seamless browsing and reading of manga collections. Enjoy an intuitive interface optimized for desktop environments.",
   "main": "./out/main/index.js",
   "author": "Rinpyre",
@@ -19,7 +19,8 @@
     "build:linux": "npm run build && electron-builder --linux"
   },
   "dependencies": {
-    "@electron-toolkit/utils": "^4.0.0"
+    "@electron-toolkit/utils": "^4.0.0",
+    "axios": "^1.13.2"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.1.0",
