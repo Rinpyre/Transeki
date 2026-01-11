@@ -1,5 +1,4 @@
-import { contextBridge } from 'electron'
-import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from 'electron'
 
 // Custom APIs for renderer
 const api = {}
@@ -9,12 +8,46 @@ const api = {}
 // just add to the DOM global.
 if (process.contextIsolated) {
     try {
-        contextBridge.exposeInMainWorld('electron', electronAPI)
+        contextBridge.exposeInMainWorld('electron', {
+            ipcRenderer: {
+                send: (channel, ...args) => ipcRenderer.send(channel, ...args),
+                on: (channel, func) => {
+                    const subscription = (_event, ...args) => func(...args)
+                    ipcRenderer.on(channel, subscription)
+                    return () => ipcRenderer.removeListener(channel, subscription)
+                },
+                once: (channel, func) => {
+                    ipcRenderer.once(channel, (_event, ...args) => func(...args))
+                },
+                invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args)
+            },
+            process: {
+                // Manually expose only safe version strings, not the whole process object
+                versions: process.versions
+            }
+        })
         contextBridge.exposeInMainWorld('api', api)
     } catch (error) {
         console.error(error)
     }
 } else {
-    window.electron = electronAPI
+    // Fallback for non-isolated contexts (not recommended but good for debugging)
+    window.electron = {
+        ipcRenderer: {
+            send: (channel, ...args) => ipcRenderer.send(channel, ...args),
+            on: (channel, func) => {
+                const subscription = (_event, ...args) => func(...args)
+                ipcRenderer.on(channel, subscription)
+                return () => ipcRenderer.removeListener(channel, subscription)
+            },
+            once: (channel, func) => {
+                ipcRenderer.once(channel, (_event, ...args) => func(...args))
+            },
+            invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args)
+        },
+        process: {
+            versions: process.versions
+        }
+    }
     window.api = api
 }

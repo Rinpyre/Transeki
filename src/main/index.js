@@ -6,14 +6,17 @@ import icon from '../../resources/icon.png?asset'
 function createWindow() {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 900,
-        height: 670,
+        width: 1280,
+        height: 720,
         show: false,
         autoHideMenuBar: true,
+        menu: null,
         ...(process.platform === 'linux' ? { icon } : {}),
         webPreferences: {
-            preload: join(__dirname, '../preload/index.js'),
-            sandbox: false
+            preload: join(__dirname, '../preload/index.cjs'),
+            sandbox: true,
+            contextIsolation: true,
+            nodeIntegration: false
         }
     })
 
@@ -40,7 +43,7 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
     // Set app user model id for windows
-    electronApp.setAppUserModelId('com.electron')
+    electronApp.setAppUserModelId('com.rinpyre.transeki')
 
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.

@@ -1,5 +1,6 @@
 {
   "name": "transeki-desktop",
+  "type": "module",
   "version": "0.0.1",
   "description": "Transeki is a feature-rich manga reader desktop application designed for seamless browsing and reading of manga collections. Enjoy an intuitive interface optimized for desktop environments.",
   "main": "./out/main/index.js",
@@ -18,7 +19,6 @@
     "build:linux": "npm run build && electron-builder --linux"
   },
   "dependencies": {
-    "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0"
   },
   "devDependencies": {
