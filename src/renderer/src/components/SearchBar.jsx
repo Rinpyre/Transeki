@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import logo from '../assets/logo.png'
+import logo from '@assets/logo.png'
 
 const SearchBar = ({ onSearch }) => {
     const [searchInput, setSearchInput] = useState('')
@@ -13,7 +13,7 @@ const SearchBar = ({ onSearch }) => {
     return (
         <form
             onSubmit={handleSubmit}
-            className="search-bar flex h-fit w-full items-center gap-3.5 rounded-2xl bg-gray-800 p-4 shadow-lg"
+            className="search-bar sticky -top-3.5 z-2 flex h-fit w-full items-center gap-3.5 rounded-2xl bg-gray-800 p-4 shadow-lg shadow-black/30"
         >
             <img src={logo} alt="Logo" className="h-8 w-8" />
             <input

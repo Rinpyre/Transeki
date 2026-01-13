@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
@@ -10,8 +10,6 @@ function createWindow() {
         height: 720,
         show: false,
         icon: icon,
-        autoHideMenuBar: true,
-        menu: null,
         ...(process.platform === 'linux' ? { icon } : {}),
         webPreferences: {
             preload: join(__dirname, '../preload/index.cjs'),
@@ -45,6 +43,9 @@ function createWindow() {
 app.whenReady().then(() => {
     // Set app user model id for windows
     electronApp.setAppUserModelId('com.rinpyre.transeki')
+
+    // Completely disable the application menu
+    Menu.setApplicationMenu(null)
 
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.
