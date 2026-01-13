@@ -1,33 +1,44 @@
 import { useState } from 'react'
-import logo from '@assets/logo.png'
+import { Search } from 'lucide-react'
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch, className = '' }) => {
     const [searchInput, setSearchInput] = useState('')
+    const [underlineFocused, setUnderlineFocused] = useState(false)
 
     const handleSubmit = (e) => {
         e.preventDefault()
         onSearch(searchInput)
-        setSearchInput('')
     }
 
     return (
         <form
             onSubmit={handleSubmit}
-            className="search-bar bg-secondary sticky -top-3.5 z-2 flex h-fit w-full items-center gap-3.5 rounded-2xl p-4 shadow-lg shadow-black/30"
+            className={
+                'search-bar bg-secondary sticky -top-3.5 z-2 flex h-13.5 w-full items-center gap-2 rounded-4xl p-2 shadow-xl shadow-black/30' +
+                ` ${className}`
+            }
         >
-            <img src={logo} alt="Logo" className="h-8 w-8" />
-            <input
-                type="text"
-                placeholder="Search..."
-                onChange={(e) => setSearchInput(e.target.value)}
-                value={searchInput}
-                className="bg-tertiary focus:ring-accent-dark text-snow grow rounded p-2 placeholder-gray-400 focus:ring-2 focus:outline-none"
-            />
+            <div className="search-wrapper bg-tertiary relative flex h-full grow flex-col items-center overflow-hidden rounded-md rounded-s-4xl">
+                <input
+                    autoFocus
+                    type="text"
+                    placeholder="Search for new manga..."
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    value={searchInput}
+                    className="text-snow h-full w-full p-1.5 pl-2.5 placeholder-gray-400 focus:outline-none"
+                    onFocus={() => setUnderlineFocused(true)}
+                    onBlur={() => setUnderlineFocused(false)}
+                />
+                <div
+                    className={`${underlineFocused ? 'bg-accent-dark scale-x-100' : 'scale-x-0 bg-transparent'} absolute bottom-px h-0.5 w-full origin-center rounded-b-xl transition-transform duration-300`}
+                    id="underline"
+                ></div>
+            </div>
             <button
                 type="submit"
-                className="bg-accent-dark hover:bg-accent text-snow rounded px-4 py-2 transition-colors duration-300 hover:cursor-pointer"
+                className="bg-accent-dark hover:bg-accent text-snow flex h-full items-center justify-center rounded-md rounded-e-4xl px-2 py-2 transition-colors duration-300 hover:cursor-pointer"
             >
-                Add
+                <Search size={20} className="mr-1" />
             </button>
         </form>
     )

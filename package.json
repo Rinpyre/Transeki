@@ -1,7 +1,7 @@
 {
   "name": "transeki-desktop",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Transeki is a feature-rich manga reader desktop application designed for seamless browsing and reading of manga collections. Enjoy an intuitive interface optimized for desktop environments.",
   "main": "./out/main/index.js",
   "author": "Rinpyre",
