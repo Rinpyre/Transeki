@@ -5,7 +5,7 @@ import { BrowsePage, LibraryPage, NotFoundPage } from '@routes'
 function App() {
     return (
         <BrowserRouter>
-            <div className="app flex h-screen bg-gray-900">
+            <div className="app bg-primary flex h-screen">
                 <Sidebar />
                 <Routes>
                     <Route path="/" element={<LibraryPage />} />

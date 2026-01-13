@@ -1,5 +1,10 @@
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Search as Browse, LibraryBig as Library, Settings, UserRound as User } from 'lucide-react'
+import {
+    BookSearch as Browse,
+    LibraryBig as Library,
+    Settings,
+    UserRound as User
+} from 'lucide-react'
 import SidebarLink from './SidebarLink'
 
 const Sidebar = () => {
@@ -20,7 +25,7 @@ const Sidebar = () => {
     const typeCounts = {}
 
     return (
-        <nav className="sidebar z-1 flex h-screen w-max flex-col bg-gray-900 p-2 text-white shadow-xl shadow-black/30">
+        <nav className="sidebar bg-secondary text-snow z-1 flex h-screen w-max flex-col p-2 shadow-xl shadow-black/30">
             <ul className="top-nav flex h-full flex-col items-center gap-1">
                 {routes.map((route) => {
                     if (!typeCounts[route.type]) {
@@ -34,12 +39,12 @@ const Sidebar = () => {
                             <div
                                 key={typeKey}
                                 id={typeKey}
-                                className="divider my-2 h-px w-10/12 bg-gray-700"
+                                className="divider bg-border my-0.5 h-px w-3/4"
                             ></div>
                         )
                     }
                     if (route.type === 'spacer') {
-                        return <div key={typeKey} id={typeKey} className="spacer grow" />
+                        return <div key={typeKey} id={typeKey} className="spacer w-full grow" />
                     }
                     return (
                         <SidebarLink

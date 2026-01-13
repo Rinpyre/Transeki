@@ -19,7 +19,7 @@ const NotFoundPage = () => {
                         href="https://discord.gg/hazHVm3nXe"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-pink-500 hover:text-pink-400"
+                        className="text-accent hover:text-accent-light"
                     >
                         Discord
                     </a>{' '}
@@ -28,7 +28,7 @@ const NotFoundPage = () => {
                         href="https://github.com" // TODO: Update GitHub issues URL on 404 page
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-pink-500 hover:text-pink-400"
+                        className="text-accent hover:text-accent-light"
                     >
                         GitHub
                     </a>
@@ -37,7 +37,7 @@ const NotFoundPage = () => {
             </div>
             <button
                 onClick={() => navigate('/')}
-                className="mt-8 rounded bg-pink-600 px-4 py-2 hover:bg-pink-700"
+                className="bg-accent hover:bg-accent-dark text-snow mt-8 rounded px-4 py-2 transition-colors hover:cursor-pointer"
             >
                 Go Home
             </button>

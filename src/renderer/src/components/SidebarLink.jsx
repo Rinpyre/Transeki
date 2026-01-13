@@ -3,8 +3,8 @@ const SidebarLink = ({ icon: Icon, isActive, onClick, label, id, className = '' 
         <li
             id={id}
             onClick={onClick}
-            className={`hover:bg-primary-900/30 cursor-pointer rounded-sm p-2 transition-colors ${
-                isActive ? 'text-pink-600 underline' : ' hover:underline'
+            className={`hover:bg-accent-dark/30 text-snow flex w-full cursor-pointer items-center rounded-sm p-2 underline-offset-5 transition-colors ${
+                isActive ? 'text-accent! underline' : 'hover:underline'
             } ${className}`}
             title={label}
         >
