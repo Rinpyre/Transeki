@@ -5,7 +5,8 @@ import {
     Earth as Link,
     Share2 as Share,
     ChevronDown as ShowMoreDown,
-    ChevronUp as ShowMoreUp
+    ChevronUp as ShowMoreUp,
+    X as Close
 } from 'lucide-react'
 import { MangaChapterItem } from '@components'
 
@@ -28,11 +29,19 @@ const MangaPanel = ({ className = '' }) => {
     return (
         <div
             className={
-                'manga-panel bg-secondary fixed top-1/2 right-6 z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 overflow-y-scroll rounded-xl py-4 shadow-xl' +
+                `manga-panel bg-secondary fixed top-1/2 right-6 z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 overflow-y-scroll rounded-xl py-4 shadow-xl transition-all duration-800` +
                 ` ${className}`
             }
             style={scrollableStyle}
         >
+            <div className="close">
+                <button
+                    className="close-btn bg-primary/70 hover:bg-accent-dark/30 absolute top-3 right-3 z-1 cursor-pointer rounded-full p-1.5 transition-colors duration-200"
+                    title="Close Panel"
+                >
+                    <Close className="text-snow transition-colors duration-200" size={20} />
+                </button>
+            </div>
             <div className="info text-snow relative h-auto w-full">
                 <div
                     id="backdrop"
