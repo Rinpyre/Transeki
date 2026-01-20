@@ -20,11 +20,15 @@ const MangaContainer = ({ children }) => {
     const handleMouseMove = (e) => {
         const glow = glowRef.current
         if (glow) {
-            if (glow.style.opacity === '0') {
-                glow.style.opacity = '0.3'
-            }
             glow.style.left = `${e.clientX - glowDimensionsRef.current.width / 2}px`
             glow.style.top = `${e.clientY - glowDimensionsRef.current.height / 2}px`
+        }
+    }
+
+    const handleMouseEnter = () => {
+        const glow = glowRef.current
+        if (glow) {
+            glow.style.opacity = '0.3'
         }
     }
 
@@ -39,11 +43,12 @@ const MangaContainer = ({ children }) => {
         <div
             className="relative flex h-full w-full flex-1"
             onMouseMove={handleMouseMove}
+            onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
             <div
                 ref={glowRef}
-                className="bg-accent-light pointer-events-none fixed top-0 left-0 h-50 w-50 rounded-full opacity-30 blur-2xl transition-opacity duration-300"
+                className="bg-accent-light pointer-events-none fixed top-0 left-0 h-50 w-50 rounded-full opacity-0 blur-2xl transition-opacity duration-300"
             ></div>
             <div
                 className="manga-container grid h-fit w-full justify-start gap-4 p-4 px-8"
