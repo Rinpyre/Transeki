@@ -7,6 +7,7 @@ import {
     ChevronDown as ShowMoreDown,
     ChevronUp as ShowMoreUp
 } from 'lucide-react'
+import { MangaChapterItem } from '@components'
 
 const MangaPanel = ({ className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
@@ -27,7 +28,7 @@ const MangaPanel = ({ className = '' }) => {
     return (
         <div
             className={
-                'manga-panel bg-secondary fixed top-1/2 right-6 z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 overflow-y-scroll rounded-xl shadow-xl' +
+                'manga-panel bg-secondary fixed top-1/2 right-6 z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 overflow-y-scroll rounded-xl py-4 shadow-xl' +
                 ` ${className}`
             }
             style={scrollableStyle}
@@ -41,7 +42,7 @@ const MangaPanel = ({ className = '' }) => {
                             'url(https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.256.jpg)'
                     }}
                 ></div>
-                <div className="cover-and-metadata flex p-4">
+                <div className="cover-and-metadata flex px-4 pb-1">
                     <div className="cover flex h-auto w-2/5 min-w-40 items-center overflow-hidden rounded-md shadow-md">
                         <img
                             src="https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.256.jpg"
@@ -58,7 +59,7 @@ const MangaPanel = ({ className = '' }) => {
                     </div>
                 </div>
             </div>
-            <div className="action-buttons flex gap-2 px-4 pb-2 text-sm">
+            <div className="action-buttons flex gap-2 px-4 py-2 text-sm">
                 <button className="add-to-library bg-tertiary/70 hover:bg-accent-dark/30 flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 transition-colors duration-200">
                     <Favorite className="text-snow transition-colors duration-200" size={18} />
                     <span>Add to Library</span>
@@ -81,9 +82,9 @@ const MangaPanel = ({ className = '' }) => {
                 </button>
             </div>
             <div
-                className="additional-info text-snow relative flex flex-col gap-2 overflow-hidden px-4 pt-1 transition-all duration-300"
+                className="additional-info text-snow relative flex flex-col gap-2 overflow-hidden px-4 transition-all duration-300"
                 ref={contentRef}
-                style={{ maxHeight: isDescriptionExpanded ? `${contentHeight}px` : '120px' }}
+                style={{ maxHeight: isDescriptionExpanded ? `${contentHeight}px` : '116px' }}
                 role="button"
                 tabIndex={0}
                 aria-expanded={isDescriptionExpanded}
@@ -163,9 +164,41 @@ const MangaPanel = ({ className = '' }) => {
                 </div>
             </div>
             <div className="read-btn my-2 px-4">
-                <button className="bg-accent-dark hover:bg-accent-dark/70 w-full cursor-pointer rounded-md px-4 py-2 transition-colors duration-200">
+                <button className="bg-accent-dark hover:bg-accent-dark/70 w-full cursor-pointer rounded-full px-4 py-2 transition-colors duration-200">
                     Start Reading
                 </button>
+            </div>
+            <div className="chapter-list px-4">
+                <div className="chapter-list-header text-metadata border-b-tertiary cursor-default border-b px-1 py-1">
+                    <h3 className="chapter-list-title">250 chapters</h3>
+                </div>
+                <div className="chapter-list-content mt-1 flex flex-col">
+                    <MangaChapterItem
+                        name="Chapter 250: The Awakening"
+                        date="2024-06-20"
+                        read={false}
+                    />
+                    <MangaChapterItem
+                        name="Chapter 249: The Final Battle"
+                        date="2024-06-13"
+                        read={true}
+                    />
+                    <MangaChapterItem
+                        name="Chapter 248: Rise of the Monarchs"
+                        date="2024-06-06"
+                        read={true}
+                    />
+                    <MangaChapterItem
+                        name="Chapter 247: Shadows of the Past"
+                        date="2024-05-30"
+                        read={false}
+                    />
+                    <MangaChapterItem
+                        name="Chapter 246: The Lost City"
+                        date="2024-05-23"
+                        read={true}
+                    />
+                </div>
             </div>
         </div>
     )

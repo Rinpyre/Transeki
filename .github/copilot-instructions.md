@@ -34,10 +34,12 @@ Use component/area name in parentheses. Examples:
 ### Subject Line Guidelines
 
 - ✅ Brief summary of changes
+- ✅ The changes should be presented as featured focused (human said) not component / code focused
 - ✅ Use imperative mood
 - ✅ No period at end
 - ✅ Max 50 chars
-- ✅ If multiple changes, combine all in one summary and detail in body
+- ✅ If multiple or complex changes, combine all in one summary and detail in body / description
+- ❌ No duplication of scope name in the summery if already in scope
 
 ### Description / Body Rules
 
