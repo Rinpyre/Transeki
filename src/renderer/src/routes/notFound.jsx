@@ -25,7 +25,7 @@ const NotFoundPage = () => {
                     </a>{' '}
                     or create an issue on{' '}
                     <a
-                        href="https://github.com" // TODO: Update GitHub issues URL on 404 page
+                        href="https://github.com/FireBoy00/Transeki/issues"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-accent hover:text-accent-light"
