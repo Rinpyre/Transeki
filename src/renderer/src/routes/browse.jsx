@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { handleSearch } from '@handlers'
 import { MangaCard, MangaContainer, SearchBar } from '@components'
+import { MangaPanel } from '@components'
 
 const BrowsePage = () => {
     const [mangaList, setMangaList] = useState([])
@@ -21,6 +22,7 @@ const BrowsePage = () => {
             style={scrollableStyle}
         >
             <SearchBar onSearch={onSearch} className="mb-2 w-1/2! max-w-3xl min-w-85" />
+            <MangaPanel className="-translate-y-[46%]" />
             <MangaContainer>
                 {mangaList.map((manga) => (
                     <MangaCard key={manga.id} manga={manga} />
