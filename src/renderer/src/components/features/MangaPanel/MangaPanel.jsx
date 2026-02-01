@@ -8,12 +8,21 @@ import {
     ChevronUp as ShowMoreUp,
     X as Close
 } from 'lucide-react'
-import { MPActionBtn, MPChapterItem } from '@components'
+import { MPActionBtn, MPChapterItem, MPGenreBadge } from '@components'
 
 const MangaPanel = ({ className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
     const [contentHeight, setContentHeight] = useState(0)
     const contentRef = useRef(null)
+
+    // #region Sample Manga Data
+    const genres = [
+        { name: 'Action' },
+        { name: 'Adventure' },
+        { name: 'Fantasy' },
+        { name: 'Supernatural' }
+    ]
+    // #endregion Sample Manga Data
 
     const scrollableStyle = {
         scrollbarWidth: 'none',
@@ -69,10 +78,10 @@ const MangaPanel = ({ className = '' }) => {
                 </div>
             </div>
             <div className="action-buttons flex gap-2 px-4 py-2 text-sm">
-                <MPActionBtn name="Add to Library" icon={Favorite} />
-                <MPActionBtn name="Tracking" icon={Tracking} disabled />
-                <MPActionBtn name="Open in WebView" icon={Link} iconOnly />
-                <MPActionBtn name="Share" icon={Share} iconOnly />
+                <MPActionBtn name="Add to Library" icon={Favorite} id="addToLibraryBtn" />
+                <MPActionBtn name="Tracking" icon={Tracking} id="trackingBtn" disabled />
+                <MPActionBtn name="Open in WebView" icon={Link} id="openInWebViewBtn" iconOnly />
+                <MPActionBtn name="Share" icon={Share} id="shareBtn" iconOnly />
             </div>
             <div
                 className="additional-info text-snow relative flex flex-col gap-2 overflow-hidden px-4 transition-all duration-300"
@@ -142,18 +151,10 @@ const MangaPanel = ({ className = '' }) => {
                     </button>
                 )}
                 <div className="details-genres pb-4">
-                    <span className="genre-badge bg-accent-dark/70 hover:bg-accent-dark/85 text-snow mr-1 mb-1 inline-block cursor-default rounded-md px-2.5 py-1.5 text-[.8em] font-semibold transition-colors duration-200">
-                        Action
-                    </span>
-                    <span className="genre-badge bg-accent-dark/70 hover:bg-accent-dark/85 text-snow mr-1 mb-1 inline-block cursor-default rounded-md px-2.5 py-1.5 text-[.8em] font-semibold transition-colors duration-200">
-                        Adventure
-                    </span>
-                    <span className="genre-badge bg-accent-dark/70 hover:bg-accent-dark/85 text-snow mr-1 mb-1 inline-block cursor-default rounded-md px-2.5 py-1.5 text-[.8em] font-semibold transition-colors duration-200">
-                        Fantasy
-                    </span>
-                    <span className="genre-badge bg-accent-dark/70 hover:bg-accent-dark/85 text-snow mr-1 mb-1 inline-block cursor-default rounded-md px-2.5 py-1.5 text-[.8em] font-semibold transition-colors duration-200">
-                        Supernatural
-                    </span>
+                    {genres.map((genre) => {
+                        const id = genre.name.toLowerCase().replace(/\s+/g, '-')
+                        return <MPGenreBadge key={id} id={id} name={genre.name} />
+                    })}
                 </div>
             </div>
             <div className="read-btn my-2 px-4">
