@@ -8,7 +8,7 @@ import {
     ChevronUp as ShowMoreUp,
     X as Close
 } from 'lucide-react'
-import { MPActionBtn, MPChapterItem, MPGenreBadge } from '@components'
+import { MPActionBtn, MPChapterItem, MPGenreBadge, MPMetadataItem } from '@components'
 
 const MangaPanel = ({ className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
@@ -60,7 +60,7 @@ const MangaPanel = ({ className = '' }) => {
                             'url(https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.256.jpg)'
                     }}
                 ></div>
-                <div className="cover-and-metadata flex px-4 pb-1">
+                <div className="flex px-4 pb-1">
                     <div className="cover flex h-auto w-2/5 min-w-40 items-center overflow-hidden rounded-md shadow-md">
                         <img
                             src="https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.256.jpg"
@@ -68,12 +68,15 @@ const MangaPanel = ({ className = '' }) => {
                             className="transition-transform duration-300 will-change-transform hover:scale-105 hover:cursor-pointer"
                         />
                     </div>
-                    <div className="metadata flex flex-col pl-4">
-                        <h2 className="title text-3xl font-bold">Solo Leveling</h2>
+                    <div className="flex w-full flex-col pl-4">
+                        <h2 className="title line-clamp-3 h-full text-3xl font-bold text-ellipsis">
+                            Solo Leveling
+                        </h2>
                         <div className="spacer grow"></div>
-                        <p className="details-author">Author: Chugong</p>
-                        <p className="details-source">Source: Webtoon</p>
-                        <p className="details-status">Status: Ongoing</p>
+                        <div className="metadata">
+                            <MPMetadataItem type="Status" value="Ongoing" />
+                            <MPMetadataItem type="Author" value="Chugong" />
+                        </div>
                     </div>
                 </div>
             </div>
