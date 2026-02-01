@@ -8,7 +8,7 @@ import {
     ChevronUp as ShowMoreUp,
     X as Close
 } from 'lucide-react'
-import { MPChapterItem } from '@components'
+import { MPActionBtn, MPChapterItem } from '@components'
 
 const MangaPanel = ({ className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
@@ -69,30 +69,10 @@ const MangaPanel = ({ className = '' }) => {
                 </div>
             </div>
             <div className="action-buttons flex gap-2 px-4 py-2 text-sm">
-                <button className="add-to-library bg-tertiary/70 hover:bg-accent-dark/30 flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 transition-colors duration-200">
-                    <Favorite className="text-snow transition-colors duration-200" size={18} />
-                    <span>Add to Library</span>
-                </button>
-                <button
-                    className="external-tracking bg-tertiary/70 hover:bg-accent-dark/30 flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled
-                    title="Tracking (Coming Soon)"
-                >
-                    <Tracking className="text-snow transition-colors duration-200" size={18} />
-                    <span>Tracking</span>
-                </button>
-                <button
-                    className="open-in-browser bg-tertiary/70 hover:bg-accent-dark/30 flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 transition-colors duration-200"
-                    title="Open in WebView"
-                >
-                    <Link className="text-snow transition-colors duration-200" size={18} />
-                </button>
-                <button
-                    className="share-manga bg-tertiary/70 hover:bg-accent-dark/30 flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-2 transition-colors duration-200"
-                    title="Share"
-                >
-                    <Share className="text-snow transition-colors duration-200" size={18} />
-                </button>
+                <MPActionBtn name="Add to Library" icon={Favorite} />
+                <MPActionBtn name="Tracking" icon={Tracking} disabled />
+                <MPActionBtn name="Open in WebView" icon={Link} iconOnly />
+                <MPActionBtn name="Share" icon={Share} iconOnly />
             </div>
             <div
                 className="additional-info text-snow relative flex flex-col gap-2 overflow-hidden px-4 transition-all duration-300"
@@ -186,27 +166,27 @@ const MangaPanel = ({ className = '' }) => {
                     <h3 className="chapter-list-title">250 chapters</h3>
                 </div>
                 <div className="chapter-list-content mt-1 flex flex-col">
-                    <MangaChapterItem
+                    <MPChapterItem
                         name="Chapter 250: The Awakening"
                         date="2024-06-20"
                         read={false}
                     />
-                    <MangaChapterItem
+                    <MPChapterItem
                         name="Chapter 249: The Final Battle"
                         date="2024-06-13"
                         read={true}
                     />
-                    <MangaChapterItem
+                    <MPChapterItem
                         name="Chapter 248: Rise of the Monarchs"
                         date="2024-06-06"
                         read={true}
                     />
-                    <MangaChapterItem
+                    <MPChapterItem
                         name="Chapter 247: Shadows of the Past"
                         date="2024-05-30"
                         read={false}
                     />
-                    <MangaChapterItem
+                    <MPChapterItem
                         name="Chapter 246: The Lost City"
                         date="2024-05-23"
                         read={true}
