@@ -8,7 +8,7 @@ import {
     ChevronUp as ShowMoreUp,
     X as Close
 } from 'lucide-react'
-import { MangaChapterItem } from '@components'
+import { MPChapterItem } from '@components'
 
 const MangaPanel = ({ className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
