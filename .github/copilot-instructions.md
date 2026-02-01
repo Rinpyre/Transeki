@@ -45,4 +45,7 @@ Use component/area name in parentheses. Examples:
 - ✅ Imperative mood: "add" not "added"
 - ✅ No period at end
 - ✅ Keep to one line if possible
+- ✅ Use bullet points for multiple changes
+- ✅ Reference issues/PRs if relevant
+- ❌ No code snippets
 - ❌ No vague messages like "Update stuff"
