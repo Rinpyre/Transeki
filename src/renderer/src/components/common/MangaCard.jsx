@@ -6,7 +6,6 @@ const MangaCard = ({ manga, onClick }) => {
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
-                // <- Add this for keyboard accessibility
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault()
                     onClick?.()
