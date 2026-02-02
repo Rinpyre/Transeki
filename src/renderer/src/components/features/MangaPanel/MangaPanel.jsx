@@ -8,21 +8,18 @@ import {
     ChevronUp as ShowMoreUp,
     X as Close
 } from 'lucide-react'
-import { MPActionBtn, MPChapterItem, MPGenreBadge, MPMetadataItem } from '@components'
+import {
+    MPActionBtn,
+    MPChapterItem,
+    MPGenreBadge,
+    MPMetadataItem,
+    RippleLoading
+} from '@components'
 
-const MangaPanel = ({ className = '' }) => {
+const MangaPanel = ({ manga, onClose, open = false, loading = false, className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
     const [contentHeight, setContentHeight] = useState(0)
     const contentRef = useRef(null)
-
-    // #region Sample Manga Data
-    const genres = [
-        { name: 'Action' },
-        { name: 'Adventure' },
-        { name: 'Fantasy' },
-        { name: 'Supernatural' }
-    ]
-    // #endregion Sample Manga Data
 
     const scrollableStyle = {
         scrollbarWidth: 'none',
@@ -38,15 +35,17 @@ const MangaPanel = ({ className = '' }) => {
     return (
         <div
             className={
-                `manga-panel bg-secondary fixed top-1/2 right-6 z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 overflow-y-scroll rounded-xl py-4 shadow-xl transition-all duration-800` +
+                `manga-panel bg-secondary fixed top-1/2 ${open ? 'right-6' : '-right-150'} z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 ${loading ? 'overflow-hidden' : 'overflow-y-scroll'} rounded-xl py-4 shadow-xl transition-all duration-300 ease-in-out` +
                 ` ${className}`
             }
             style={scrollableStyle}
         >
+            {loading && <RippleLoading />}
             <div className="close">
                 <button
                     className="close-btn bg-primary/70 hover:bg-accent-dark/30 absolute top-3 right-3 z-1 cursor-pointer rounded-full p-1.5 transition-colors duration-200"
                     title="Close Panel"
+                    onClick={onClose}
                 >
                     <Close className="text-snow transition-colors duration-200" size={20} />
                 </button>
@@ -56,26 +55,26 @@ const MangaPanel = ({ className = '' }) => {
                     id="backdrop"
                     className="absolute -z-1 h-full w-full rounded-md bg-cover bg-center bg-no-repeat opacity-10 blur-xs"
                     style={{
-                        backgroundImage:
-                            'url(https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.256.jpg)'
+                        backgroundImage: `url(${manga.cover})`
                     }}
                 ></div>
                 <div className="flex px-4 pb-1">
                     <div className="cover flex h-auto w-2/5 min-w-40 items-center overflow-hidden rounded-md shadow-md">
                         <img
-                            src="https://uploads.mangadex.org/covers/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/e90bdc47-c8b9-4df7-b2c0-17641b645ee1.jpg.256.jpg"
-                            alt="Solo Leveling Cover"
+                            src={manga.cover}
+                            alt={manga.title}
                             className="transition-transform duration-300 will-change-transform hover:scale-105 hover:cursor-pointer"
                         />
                     </div>
                     <div className="flex w-full flex-col pl-4">
-                        <h2 className="title line-clamp-3 h-full text-3xl font-bold text-ellipsis">
-                            Solo Leveling
+                        <h2 className="title line-clamp-3 text-3xl font-bold text-ellipsis">
+                            {manga.title}
                         </h2>
                         <div className="spacer grow"></div>
                         <div className="metadata">
-                            <MPMetadataItem type="Status" value="Ongoing" />
-                            <MPMetadataItem type="Author" value="Chugong" />
+                            <MPMetadataItem type="Status" value={manga.status} />
+                            <MPMetadataItem type="Author" value={manga.author} />
+                            <MPMetadataItem type="Source" value={manga.source} />
                         </div>
                     </div>
                 </div>
@@ -105,31 +104,7 @@ const MangaPanel = ({ className = '' }) => {
                     <h3 className="description-title text-metadata cursor-default text-lg font-semibold underline underline-offset-3">
                         Description:
                     </h3>
-                    <p className="description-text mt-1 text-sm">
-                        In a world where hunters with magical abilities fight deadly monsters to
-                        protect humanity, an E-rank hunter named Sung Jin-Woo embarks on a journey
-                        to become the strongest hunter after a near-death experience in a dangerous
-                        dungeon. In a world where hunters with magical abilities fight deadly
-                        monsters to protect humanity, an E-rank hunter named Sung Jin-Woo embarks on
-                        a journey to become the strongest hunter after a near-death experience in a
-                        dangerous dungeon. In a world where hunters with magical abilities fight
-                        deadly monsters to protect humanity, an E-rank hunter named Sung Jin-Woo
-                        embarks on a journey to become the strongest hunter after a near-death
-                        experience in a dangerous dungeon. In a world where hunters with magical
-                        abilities fight deadly monsters to protect humanity, an E-rank hunter named
-                        Sung Jin-Woo embarks on a journey to become the strongest hunter after a
-                        near-death experience in a dangerous dungeon. In a world where hunters with
-                        magical abilities fight deadly monsters to protect humanity, an E-rank
-                        hunter named Sung Jin-Woo embarks on a journey to become the strongest
-                        hunter after a near-death experience in a dangerous dungeon. In a world
-                        where hunters with magical abilities fight deadly monsters to protect
-                        humanity, an E-rank hunter named Sung Jin-Woo embarks on a journey to become
-                        the strongest hunter after a near-death experience in a dangerous dungeon.
-                        In a world where hunters with magical abilities fight deadly monsters to
-                        protect humanity, an E-rank hunter named Sung Jin-Woo embarks on a journey
-                        to become the strongest hunter after a near-death experience in a dangerous
-                        dungeon.
-                    </p>
+                    <p className="description-text mt-1 text-sm">{manga.description}</p>
                 </div>
                 {contentHeight > 120 && (
                     <button className="show-more absolute right-3 bottom-1 flex h-5 cursor-pointer px-1.5">
@@ -154,9 +129,9 @@ const MangaPanel = ({ className = '' }) => {
                     </button>
                 )}
                 <div className="details-genres pb-4">
-                    {genres.map((genre) => {
-                        const id = genre.name.toLowerCase().replace(/\s+/g, '-')
-                        return <MPGenreBadge key={id} id={id} name={genre.name} />
+                    {manga.genres.map((genre) => {
+                        const id = genre.toLowerCase().replace(/\s+/g, '-')
+                        return <MPGenreBadge key={id} id={id} name={genre} />
                     })}
                 </div>
             </div>
@@ -167,34 +142,17 @@ const MangaPanel = ({ className = '' }) => {
             </div>
             <div className="chapter-list px-4">
                 <div className="chapter-list-header text-metadata border-b-tertiary cursor-default border-b px-1 py-1">
-                    <h3 className="chapter-list-title">250 chapters</h3>
+                    <h3 className="chapter-list-title">{manga.chapters?.length || 0} chapters</h3>
                 </div>
                 <div className="chapter-list-content mt-1 flex flex-col">
-                    <MPChapterItem
-                        name="Chapter 250: The Awakening"
-                        date="2024-06-20"
-                        read={false}
-                    />
-                    <MPChapterItem
-                        name="Chapter 249: The Final Battle"
-                        date="2024-06-13"
-                        read={true}
-                    />
-                    <MPChapterItem
-                        name="Chapter 248: Rise of the Monarchs"
-                        date="2024-06-06"
-                        read={true}
-                    />
-                    <MPChapterItem
-                        name="Chapter 247: Shadows of the Past"
-                        date="2024-05-30"
-                        read={false}
-                    />
-                    <MPChapterItem
-                        name="Chapter 246: The Lost City"
-                        date="2024-05-23"
-                        read={true}
-                    />
+                    {manga.chapters?.map((chapter, idx) => (
+                        <MPChapterItem
+                            key={`${manga.id}-ch-${idx}`}
+                            name={chapter.title}
+                            date={chapter.date}
+                            read={chapter.read}
+                        />
+                    ))}
                 </div>
             </div>
         </div>
