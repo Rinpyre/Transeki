@@ -35,7 +35,7 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
     return (
         <div
             className={
-                `manga-panel bg-secondary fixed top-1/2 ${open ? 'right-6' : '-right-150'} z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 ${loading ? 'overflow-hidden' : 'overflow-y-scroll'} rounded-xl py-4 shadow-xl transition-all duration-300 ease-in-out` +
+                `manga-panel bg-secondary fixed top-1/2 ${open ? 'right-6' : '-right-150'} z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 ${loading ? 'overflow-hidden' : 'overflow-y-scroll'} rounded-xl pb-4 shadow-xl transition-all duration-300 ease-in-out` +
                 ` ${className}`
             }
             style={scrollableStyle}
@@ -58,7 +58,7 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
                         backgroundImage: `url(${manga.cover})`
                     }}
                 ></div>
-                <div className="flex px-4 pb-1">
+                <div className="flex px-4 pt-4 pb-2">
                     {/* Fixed the width of the cover */}
                     <div className="cover flex h-auto w-2/5 items-center overflow-hidden rounded-md shadow-md">
                         <img
@@ -108,7 +108,7 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
                     }
                 }}
             >
-                <div className="description flex flex-col">
+                <div className="description flex flex-col pb-2.5">
                     <h3 className="description-title text-metadata cursor-default text-lg font-semibold underline underline-offset-3">
                         Description:
                     </h3>
@@ -136,7 +136,7 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
                         </span>
                     </button>
                 )}
-                <div className="details-genres pb-4">
+                <div className="details-genres flex flex-wrap pb-7">
                     {manga.genres.map((genre) => {
                         const id = genre.toLowerCase().replace(/\s+/g, '-')
                         return <MPGenreBadge key={id} id={id} name={genre} />
@@ -157,7 +157,7 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
                         <MPChapterItem
                             key={`${manga.id}-ch-${idx}`}
                             name={chapter.title}
-                            date={chapter.date}
+                            date={chapter.releaseDate}
                             read={chapter.read}
                         />
                     ))}
