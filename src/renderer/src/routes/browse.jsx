@@ -16,18 +16,18 @@ const BrowsePage = () => {
         setMangaList(results || [])
     }
 
+    // TODO: Fetch manga data by ID (this is a placeholder, replace with actual data fetching logic)
+    // TODO: Remove all console.log statements after debugging
     const handleMangaCardClick = async (mangaID) => {
         console.log('Manga Card Clicked:', mangaID)
-        // Fetch manga data by ID (this is a placeholder, replace with actual data fetching logic)
         setIsPanelOpen(true)
         setIsPanelLoading(true)
         await sleep(500)
         const mangaListItem = mangaList.find((manga) => manga.id === mangaID)
 
         const mangaData = {
-            ...demoDatumManga, // <- Copy all properties from demo
+            ...demoDatumManga,
             ...(mangaListItem && {
-                // <- If found in list, override these
                 title: mangaListItem.title,
                 cover: mangaListItem.cover,
                 id: mangaListItem.id
