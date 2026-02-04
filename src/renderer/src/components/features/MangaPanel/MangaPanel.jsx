@@ -74,7 +74,7 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
                             />
                         </div>
                         <div className="flex w-full flex-col pl-4">
-                            <h2 className="title line-clamp-3 text-3xl font-bold text-ellipsis">
+                            <h2 className="title line-clamp-3 text-2xl font-semibold text-ellipsis">
                                 {manga.title}
                             </h2>
                             <div className="spacer grow"></div>
