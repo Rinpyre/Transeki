@@ -110,7 +110,7 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
             >
                 <div className="description flex flex-col pb-2.5">
                     <h3 className="description-title text-metadata cursor-default text-lg font-semibold underline underline-offset-3">
-                        Description:
+                        {manga.type} Description:
                     </h3>
                     <p className="description-text mt-1 text-sm">{manga.description}</p>
                 </div>
