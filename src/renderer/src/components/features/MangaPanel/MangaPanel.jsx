@@ -59,7 +59,8 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
                     }}
                 ></div>
                 <div className="flex px-4 pb-1">
-                    <div className="cover flex h-auto w-2/5 min-w-40 items-center overflow-hidden rounded-md shadow-md">
+                    {/* Fixed the width of the cover */}
+                    <div className="cover flex h-auto w-2/5 items-center overflow-hidden rounded-md shadow-md">
                         <img
                             src={manga.cover}
                             alt={manga.title}
@@ -80,10 +81,17 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
                 </div>
             </div>
             <div className="action-buttons flex gap-2 px-4 py-2 text-sm">
-                <MPActionBtn name="Add to Library" icon={Favorite} id="addToLibraryBtn" />
+                {/* Disabled for now until functionality is implemented */}
+                <MPActionBtn name="Add to Library" icon={Favorite} id="addToLibraryBtn" disabled />
                 <MPActionBtn name="Tracking" icon={Tracking} id="trackingBtn" disabled />
-                <MPActionBtn name="Open in WebView" icon={Link} id="openInWebViewBtn" iconOnly />
-                <MPActionBtn name="Share" icon={Share} id="shareBtn" iconOnly />
+                <MPActionBtn
+                    name="Open in WebView"
+                    icon={Link}
+                    id="openInWebViewBtn"
+                    iconOnly
+                    disabled
+                />
+                <MPActionBtn name="Share" icon={Share} id="shareBtn" iconOnly disabled />
             </div>
             <div
                 className="additional-info text-snow relative flex flex-col gap-2 overflow-hidden px-4 transition-all duration-300"
