@@ -6,7 +6,7 @@ Components are organized into **three logical categories** with a **barrel expor
 
 ## Folder Structure
 
-```
+```text
 components/
 ├── index.js              # Main barrel export (re-exports all subfolders)
 ├── ARCHITECTURE.md       # This file
@@ -31,18 +31,21 @@ components/
 ## Category Guidelines
 
 ### Layout Components
+
 - **Purpose**: Page structure and navigation containers
 - **Examples**: Sidebar, header, footer, grid layouts
 - **Reusability**: Medium (specific to app structure)
 - **Location**: `layout/`
 
 ### Common Components
+
 - **Purpose**: Generic, reusable UI elements
 - **Examples**: Cards, buttons, input fields, badges
 - **Reusability**: High (can be used anywhere)
 - **Location**: `common/`
 
 ### Feature Components
+
 - **Purpose**: Domain-specific features with complex logic
 - **Examples**: MangaPanel (detail view), ChapterReader, UserProfile
 - **Reusability**: Low (feature-specific)
@@ -77,8 +80,8 @@ Within feature folders, use relative imports for **utilities and hooks only**:
 
 ```jsx
 // Inside features/MangaPanel/MangaPanel.jsx
-import { useChapterNavigation } from './hooks/useChapterNavigation'  // Local utility
-import { MangaChapterItem } from '@components'                     // Via barrel
+import { useChapterNavigation } from './hooks/useChapterNavigation' // Local utility
+import { MangaChapterItem } from '@components' // Via barrel
 ```
 
 ## Barrel Export Pattern
@@ -110,28 +113,31 @@ export * from './features'
 
 ## Benefits
 
-| Benefit | Reason |
-|---------|--------|
-| **Folder-agnostic imports** | Rename folders without breaking imports |
-| **DRY principle** | Single line imports, no code duplication |
-| **Scalability** | Change internal structure freely |
-| **Clear intent** | Developers immediately understand component purpose |
-| **Preventing circular deps** | Barrel pattern isolates export scope |
+| Benefit                      | Reason                                              |
+| ---------------------------- | --------------------------------------------------- |
+| **Folder-agnostic imports**  | Rename folders without breaking imports             |
+| **DRY principle**            | Single line imports, no code duplication            |
+| **Scalability**              | Change internal structure freely                    |
+| **Clear intent**             | Developers immediately understand component purpose |
+| **Preventing circular deps** | Barrel pattern isolates export scope                |
 
 ## Future Expansion
 
 ### Adding a New Layout Component
-```
+
+```text
 layout/
 ├── index.js
 ├── Sidebar.jsx
 ├── Header.jsx          # New component
 └── HeaderNav.jsx       # New component
 ```
+
 Update `layout/index.js` and you're done. No other files need changes.
 
 ### Adding a Complex Feature
-```
+
+```text
 features/
 └── ChapterReader/
     ├── index.js
@@ -142,12 +148,14 @@ features/
         ├── useChapterData.js
         └── useReadingPosition.js
 ```
+
 Create the feature subfolder with its own `index.js` barrel. Update `features/index.js` to export from it.
 
 ### Scaling to Multiple Imports
+
 When one category becomes large (10+ components), consider subcategories:
 
-```
+```text
 common/
 ├── index.js
 ├── forms/              # Subfolder for form-related components
