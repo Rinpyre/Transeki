@@ -1,6 +1,17 @@
-const MangaCard = ({ manga }) => {
+const MangaCard = ({ manga, onClick }) => {
     return (
-        <div className="manga-card group flex w-full flex-col rounded-lg transition-all duration-300 will-change-transform hover:-translate-y-1">
+        <div
+            className="manga-card group flex w-full flex-col rounded-lg transition-all duration-300 will-change-transform hover:-translate-y-1"
+            onClick={onClick}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    onClick?.()
+                }
+            }}
+        >
             <div className="image overflow-hidden rounded-md hover:cursor-pointer">
                 <img
                     src={manga.cover}
