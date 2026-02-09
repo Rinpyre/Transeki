@@ -63,12 +63,11 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
                         }}
                     ></div>
                     <div className="flex px-4 pt-4 pb-2">
-                        {/* Fixed the width of the cover */}
-                        <div className="cover flex h-auto w-2/5 items-center overflow-hidden rounded-md shadow-md">
+                        <div className="cover w-2/5 overflow-hidden rounded-md shadow-md">
                             <img
                                 src={manga.cover}
                                 alt={manga.title}
-                                className="transition-transform duration-300 will-change-transform hover:scale-105 hover:cursor-pointer"
+                                className="h-full w-full object-cover transition-transform duration-300 will-change-transform hover:scale-105 hover:cursor-pointer"
                             />
                         </div>
                         <div className="flex w-full flex-col pl-4">
