@@ -39,27 +39,25 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
                 ` ${className}`
             }
         >
+            <button
+                className="close-btn hover:bg-accent-dark/30 bg-secondary absolute -top-2.5 -right-2.5 z-1 cursor-pointer rounded-full p-1.5 transition-colors duration-200"
+                title="Close Panel"
+                onClick={onClose}
+            >
+                <Close
+                    className="text-snow bg-primary/70 box-content rounded-full p-1.5 transition-colors duration-200"
+                    size={16}
+                />
+            </button>
             {loading && <RippleLoading />}
             <div
-                className={`manga-panel-content ${loading ? 'overflow-hidden' : 'overflow-y-scroll'} h-full w-full`}
+                className={`manga-panel-content overflow-hidden rounded-xl ${!loading && 'overflow-y-scroll'} h-full w-full`}
                 style={scrollableStyle}
             >
-                <div className="close">
-                    <button
-                        className="close-btn hover:bg-accent-dark/30 bg-secondary absolute -top-2.5 -right-2.5 z-1 cursor-pointer rounded-full p-1.5 transition-colors duration-200"
-                        title="Close Panel"
-                        onClick={onClose}
-                    >
-                        <Close
-                            className="text-snow bg-primary/70 box-content rounded-full p-1.5 transition-colors duration-200"
-                            size={16}
-                        />
-                    </button>
-                </div>
-                <div className="info text-snow relative h-auto w-full">
+                <div className="info text-snow relative w-full">
                     <div
                         id="backdrop"
-                        className="absolute -z-1 h-full w-full rounded-md bg-cover bg-center bg-no-repeat opacity-10 blur-xs"
+                        className="absolute -z-1 h-full w-full bg-cover bg-center bg-no-repeat opacity-10 blur-xs"
                         style={{
                             backgroundImage: `url(${manga.cover})`
                         }}
