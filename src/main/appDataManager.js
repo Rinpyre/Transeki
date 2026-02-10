@@ -1,6 +1,6 @@
 import { app } from 'electron'
 import { join } from 'path'
-import { mkdir } from 'fs/promises'
+import { mkdir, stat } from 'fs/promises'
 
 // Configurable root folder name within Electron's userData directory
 // Can be changed to customize where app data is stored
@@ -54,18 +54,53 @@ function getFolderPath(folderName) {
 async function initializeAppData() {
     try {
         const rootPath = getAppDataPath()
+        let rootExists = false
 
-        // Create root appdata directory
-        await mkdir(rootPath, { recursive: true })
+        // Check if root appdata directory exists
+        try {
+            await stat(rootPath)
+            rootExists = true
+        } catch {
+            // Directory doesn't exist, will be created
+            rootExists = false
+        }
+
+        // Create root appdata directory if it doesn't exist
+        if (!rootExists) {
+            await mkdir(rootPath, { recursive: true })
+            if (process.env.NODE_ENV === 'development') {
+                console.log(`[AppData] Created root directory at: ${rootPath}`)
+            }
+        } else if (process.env.NODE_ENV === 'development') {
+            console.log(`[AppData] Root directory already exists at: ${rootPath}`)
+        }
 
         // Create all required subdirectories
         for (const folder of Object.values(FOLDERS)) {
             const folderPath = join(rootPath, folder)
-            await mkdir(folderPath, { recursive: true })
+            let folderExists = false
+
+            // Check if folder exists
+            try {
+                await stat(folderPath)
+                folderExists = true
+            } catch {
+                // Folder doesn't exist, will be created
+                folderExists = false
+            }
+
+            if (!folderExists) {
+                await mkdir(folderPath, { recursive: true })
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(`[AppData]   Created subfolder: ${folder}`)
+                }
+            } else if (process.env.NODE_ENV === 'development') {
+                console.log(`[AppData]   Skipped existing subfolder: ${folder}`)
+            }
         }
 
         if (process.env.NODE_ENV === 'development') {
-            console.log(`[AppData] Initialized at: ${rootPath}`)
+            console.log(`[AppData] Initialization complete`)
         }
     } catch (error) {
         console.error('[AppData] Initialization failed:', error.message)
