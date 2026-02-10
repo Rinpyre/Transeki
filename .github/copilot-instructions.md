@@ -127,3 +127,26 @@ Do NOT include:
 - One feature = one PR (keep related changes together)
 - Aim for <500 lines changed for easier review
 - If feature is massive, consider breaking into sequential PRs
+
+### GitHub CLI Tips for PR Body Formatting
+
+When using `gh pr create` or `gh pr edit` with markdown content containing backticks:
+
+- ❌ **DO NOT** escape backticks with `\`` in the `--body` flag - the CLI will remove or mangle them
+- ❌ **DO NOT** use `--body` flag for content with backticks - shell escaping causes issues
+- ✅ **DO** use `--body-file` to pass PR body from a temporary markdown file instead
+  - Create temp file with markdown content using `Out-File` or similar
+  - Pass to `gh pr edit/create` with `--body-file pr_body.md`
+  - Delete temp file after command completes
+  - This preserves backticks and all markdown formatting perfectly
+
+Example:
+
+```powershell
+@'
+## Overview
+Uses `getAppDataPath()` function for paths
+'@ | Out-File -FilePath pr_body.md -Encoding UTF8
+gh pr edit 2 --body-file pr_body.md
+rm pr_body.md
+```
