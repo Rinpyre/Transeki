@@ -18,9 +18,9 @@ const FOLDERS = {
  * Get the root appdata directory path
  * Uses Electron's app.getPath('userData') as base, then appends configurable APP_DATA_FOLDER_NAME
  * Platform-specific base paths:
- * - Windows: %APPDATA%\Transeki\userData
- * - macOS: ~/Library/Application Support/Transeki/userData
- * - Linux: ~/.config/Transeki/userData
+ * - Windows: %APPDATA%\transeki-desktop\userData
+ * - macOS: ~/Library/Application Support/transeki-desktop/userData
+ * - Linux: ~/.config/transeki-desktop/userData
  */
 function getAppDataPath() {
     const baseUserDataPath = app.getPath('userData')
