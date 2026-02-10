@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
+import { initializeAppData, getAppDataPath, getFolderPath } from './appDataManager.js'
 
 function createWindow() {
     // Create the browser window.
@@ -47,6 +48,11 @@ app.whenReady().then(() => {
     // Completely disable the application menu
     Menu.setApplicationMenu(null)
 
+    // Initialize appdata directory structure
+    initializeAppData().catch((error) => {
+        console.error('Failed to initialize appdata:', error)
+    })
+
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.
     // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
@@ -56,6 +62,10 @@ app.whenReady().then(() => {
 
     // IPC test
     ipcMain.on('ping', () => console.log('pong'))
+
+    // AppData IPC handlers
+    ipcMain.handle('get-appdata-path', () => getAppDataPath())
+    ipcMain.handle('get-folder-path', (_, folderName) => getFolderPath(folderName))
 
     createWindow()
 
