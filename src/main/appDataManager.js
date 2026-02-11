@@ -2,11 +2,7 @@ import { app } from 'electron'
 import { join } from 'path'
 import { mkdir, stat } from 'fs/promises'
 
-// Configurable root folder name within Electron's userData directory
-// Can be changed to customize where app data is stored
 const APP_DATA_FOLDER_NAME = 'userData'
-
-// Subfolder structure constants
 const FOLDERS = {
     DB: 'db',
     CONFIG: 'config',
@@ -16,7 +12,6 @@ const FOLDERS = {
 
 /**
  * Get the root appdata directory path
- * Uses Electron's app.getPath('userData') as base, then appends configurable APP_DATA_FOLDER_NAME
  * Platform-specific base paths:
  * - Windows: %APPDATA%\transeki-desktop\userData
  * - macOS: ~/Library/Application Support/transeki-desktop/userData
@@ -29,7 +24,7 @@ function getAppDataPath() {
 
 /**
  * Get a specific folder path within the appdata directory
- * @param {string} folderName - One of: 'db', 'config', 'settings', 'extensions'
+ * @param {string} folderName - One of: db | config | settings | extensions
  * @returns {string} Full path to the requested folder
  */
 function getFolderPath(folderName) {
@@ -48,7 +43,7 @@ function getFolderPath(folderName) {
 /**
  * Initialize the appdata directory structure
  * Creates all required folders if they don't exist
- * Silently succeeds if folders already exist (idempotent)
+ * Skipps creation if folders already exist (idempotent)
  * @returns {Promise<void>}
  */
 async function initializeAppData() {
