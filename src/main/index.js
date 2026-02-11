@@ -7,8 +7,8 @@ import { initializeAppData, getAppDataPath, getFolderPath } from './appDataManag
 function createWindow() {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 1280,
-        height: 720,
+        width: 1684, // +16px
+        height: 851, // +39px
         show: false,
         icon: icon,
         ...(process.platform === 'linux' ? { icon } : {}),
