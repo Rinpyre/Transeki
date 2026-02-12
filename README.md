@@ -1,32 +1,77 @@
-# Transeki
+# Transeki ⛩️
 
-A native desktop manga reader because the current alternative is either having 10 tabs open to search multiple sources or bookmarking in the browser—since a source might go down and take your reading list with it.
-
-## The Problem
-
-You find a source, build up a reading list, but then DMCA or whatever hits and the site disappears. Your reading list? Gone. So you end up managing bookmarks across browsers, keeping spreadsheets, or just... losing track of stuff.
-
-## What's the Plan?
-
-The idea is to have extensions as sources you can add to a folder and they just work. Eventually a UI too. But first I need the extension system, library page, reader, and settings in place. Then maybe offline downloads and auto-updating. Extensions will be in a separate repo so people can actually contribute to them without breaking the main app and to learn from our godfather [Tachiyomi](https://github.com/tachiyomiorg).
-
-## Tech Stack
-
-It's built with **React** and **Tailwind** for UI, **Vite** to bundle it all together, and **Electron** because... I preferred JavaScript before and I still do so... too bad for that 300MB that Electron consumes.
-
-## Current State
-
-Started 4 weeks ago. It's... in shambles or "a work in progress", take your pick. Right now it only has the browsing page and a simple looking layout that I'll remake soon and the only thing good in it is the details panel, which, without actual sources doesn't do much, but hey, it got a loading animation at least.
+> **A native desktop manga reader built for local library safety.**
 
 ![Browse page + details panel screenshot](.github/screenshot.png)
 
-> **Fair warning:** I have AuDHD, I'm lazy (or have _Executive Dysfunction_ if you prefer fancy names), and I code maybe 1-4 hours a week sometimes. Expect irregular updates, mood swings in how I communicate on discord, and no release date yet. Could take a year. Might take longer if life gets busy. This is a slow-burn ~~(chaos-burn)~~ project.
+## 🧐 The Problem
 
----
+Even though I mostly read on my phone now (using _Yokai_), I used to read on PC and I feel the pain.
 
-If you want to hang out in the Discord, watch the... sadly slow progress, and occasionally get muted for randomly bringing up Naruto/DBZ/One Piece out of the blue, come on in (not to hate, but hey... I got preferences too you know, so too bad). Just don't expect an instant update if you ask `"when update"`, but do feel free to do so, who knows, maybe it works.
+- I hate having 10 browser tabs open to search different sources.
+- I hate bookmarking URLs only to find them dead a month later.
+- I want a local library that survives even if the source extension breaks.
 
-**Discord:** [discord.gg/Transeki](https://discord.gg/hazHVm3nXe)  
-**GitHub:** [rinpyre/Transeki](https://github.com/Rinpyre/Transeki)
+## 🛠️ The Project
 
-(_If you read this far, you might as well join the Discord already. 🤷_)
+My goal is a **Native Desktop Manga Reader** that prioritizes local library management.
+
+I specifically learned **React**, **Vite**, **Tailwind**, and **GitHub Actions** to build this. I wanted full control over the app, so AI is used to help me learn and plan, not to write the core logic.
+
+### Tech Stack
+
+- **Core:** Electron + React + Vite
+- **Styling:** TailwindCSS
+- **Why Electron?** Because I prefer JavaScript. _(Yes, I know it consumes 300MB of RAM, but... it is what it is)_
+
+## 🚧 Current Status (Early WIP)
+
+Started `January 11, 2026 at 2:25 AM`.
+
+- **Browse Page:** Functional for one hard coded source, but basic. I'm planning to remake the layout soon to match my vision better and support multiple sources.
+- **Details Panel:** Opens as soon as you click a manga card. Currently uses fetches demo data because the extension system is being built.  
+  _> It does only changes the tile and cover in the panel to the manga clicked to show it works._
+- **UI:** Clean and functional, but I'm obsessing over small details (like corner radius) as I learn.
+
+## 🗺️ Roadmap
+
+1. Build the actual **Extension System** (Inspired by Tachiyomi's architecture).
+2. Finish the **Library Page** (The core feature).
+3. Build the **Reader** and **Settings**. (Vertical focused at first).
+4. Offline Downloads & Auto-updates.
+
+_> Long term dream? Maybe sync/accounts, but that's a long way off._
+
+## ⚡ Getting Started (For Devs)
+
+If you want to run the app locally:
+
+```bash
+# Clone the repository
+git clone https://github.com/Rinpyre/Transeki.git
+
+# Enter the directory
+cd Transeki
+
+# Install dependencies
+npm install
+
+# Run the dev server with hot reload
+npm run dev
+```
+
+## ⚠️ The "Developer" Disclaimer
+
+I have AuDHD, so my coding schedule is... chaotic.
+
+- I might code 4 hours one week, then nothing for two weeks.
+- I sometimes get stuck fixing a 2px misalignment instead of building big features.
+- This is a slow-burn hobby project. I am not promising a release date.
+
+## 🤝 Community & Discord
+
+If you want to hang out, watch the progress, or give feedback on the UI, join the Discord.
+
+- Discord: [discord.gg/Transeki](https://dicord.gg/hazHVm3nXe)
+- Reddit: [r/Transeki](https://www.reddit.com/r/Transeki)
+- GitHub: [rinpyre/Transeki](https://github.com/Rinpyre/Transeki)
