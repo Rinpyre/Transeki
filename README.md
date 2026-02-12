@@ -1,8 +1,17 @@
-# <center>⛩️ Transeki ⛩️</center>
+<div align="center">
 
-> **<center>A native desktop manga reader built for local library safety.</center>**
+# ⛩️ Transeki ⛩️
 
-![Browse page + details panel screenshot](.github/screenshot.png)
+  <img src=".github/screenshot.png" alt="Transeki Screenshot" width="800" />
+
+  <p>A native desktop manga reader built for local library safety.</p>
+
+  <a href="https://discord.gg/hazHVm3nXe">
+    <img src="https://img.shields.io/discord/1251927290552516669?label=Discord&logo=discord" alt="Discord" />
+  </a>
+  <img alt="GitHub License" src="https://badgen.net/github/license/Rinpyre/Transeki">
+
+</div>
 
 ## 🧐 The Problem
 
