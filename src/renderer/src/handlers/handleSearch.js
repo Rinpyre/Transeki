@@ -45,7 +45,7 @@ export const handleSearch = async (query) => {
             params: {
                 title: query,
                 includes: ['cover_art'],
-                limit: 10
+                limit: 20
             }
         })
         console.log(`Received response for query "${query}":`, resp.data)

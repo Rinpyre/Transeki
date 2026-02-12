@@ -21,6 +21,10 @@ if (process.contextIsolated) {
                 },
                 invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args)
             },
+            appData: {
+                getAppDataPath: () => ipcRenderer.invoke('get-appdata-path'),
+                getFolderPath: (folderName) => ipcRenderer.invoke('get-folder-path', folderName)
+            },
             process: {
                 // Manually expose only safe version strings, not the whole process object
                 versions: process.versions
@@ -44,6 +48,10 @@ if (process.contextIsolated) {
                 ipcRenderer.once(channel, (_event, ...args) => func(...args))
             },
             invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args)
+        },
+        appData: {
+            getAppDataPath: () => ipcRenderer.invoke('get-appdata-path'),
+            getFolderPath: (folderName) => ipcRenderer.invoke('get-folder-path', folderName)
         },
         process: {
             versions: process.versions

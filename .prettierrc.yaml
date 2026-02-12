@@ -4,7 +4,7 @@ printWidth: 100
 trailingComma: none
 tabWidth: 4
 overrides:
-  - files: '*.{yaml,yml,json}'
+  - files: '*.{yaml,yml,json,md}'
     options:
       tabWidth: 2
 plugins: ['prettier-plugin-tailwindcss']

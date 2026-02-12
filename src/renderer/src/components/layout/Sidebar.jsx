@@ -5,7 +5,7 @@ import {
     Settings,
     UserRound as User
 } from 'lucide-react'
-import SidebarLink from './SidebarLink'
+import { SidebarLink } from '@components'
 
 const Sidebar = () => {
     const navigate = useNavigate()

@@ -9,7 +9,7 @@ const SidebarLink = ({ icon: Icon, isActive, onClick, label, id, className = '' 
             title={label}
         >
             <Icon size={26} />
-            <span className="mt-1 font-semibold">{label}</span>
+            <span className="mt-1 text-sm font-semibold">{label}</span>
         </li>
     )
 }

@@ -24,7 +24,8 @@ export default defineConfig({
                 '@components': resolve('src/renderer/src/components'),
                 '@handlers': resolve('src/renderer/src/handlers'),
                 '@routes': resolve('src/renderer/src/routes'),
-                '@assets': resolve('src/renderer/src/assets')
+                '@assets': resolve('src/renderer/src/assets'),
+                '@utils': resolve('src/renderer/utils')
             }
         },
         plugins: [react()]
