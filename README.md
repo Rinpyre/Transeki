@@ -27,6 +27,6 @@ Started 4 weeks ago. It's... in shambles or "a work in progress", take your pick
 If you want to hang out in the Discord, watch the... sadly slow progress, and occasionally get muted for randomly bringing up Naruto/DBZ/One Piece out of the blue, come on in (not to hate, but hey... I got preferences too you know, so too bad). Just don't expect an instant update if you ask `"when update"`, but do feel free to do so, who knows, maybe it works.
 
 **Discord:** [discord.gg/Transeki](https://discord.gg/hazHVm3nXe)  
-**GitHub:** [FireBoy00/Transeki](https://github.com/FireBoy00/Transeki)
+**GitHub:** [rinpyre/Transeki](https://github.com/Rinpyre/Transeki)
 
 (_If you read this far, you might as well join the Discord already. 🤷_)
