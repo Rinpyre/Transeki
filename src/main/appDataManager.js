@@ -7,7 +7,7 @@ const FOLDERS = {
     DB: 'db',
     CONFIG: 'config',
     SETTINGS: 'settings',
-    EXTENSIONS: 'extensions'
+    PLUGINS: 'plugins'
 }
 
 /**
@@ -24,7 +24,7 @@ function getAppDataPath() {
 
 /**
  * Get a specific folder path within the appdata directory
- * @param {string} folderName - One of: db | config | settings | extensions
+ * @param {string} folderName - One of: db | config | settings | plugins
  * @returns {string} Full path to the requested folder
  */
 function getFolderPath(folderName) {
