@@ -19,7 +19,7 @@ Even though I mostly read on my phone now (using _Yokai_), I used to read on PC 
 
 - I hate having 10 browser tabs open to search different sources.
 - I hate bookmarking URLs only to find them dead a month later.
-- I want a local library that survives even if the source extension breaks.
+- I want a local library that survives even if the source breaks.
 
 ## 🛠️ The Project
 
@@ -38,27 +38,27 @@ I specifically learned **React**, **Vite**, **Tailwind**, and **GitHub Actions**
 Started `January 11, 2026 at 2:25 AM`.
 
 - **Browse Page:** Functional for one hard coded source, but basic. I'm planning to remake the layout soon to match my vision better and support multiple sources.
-- **Details Panel:** Opens as soon as you click a manga card. Currently uses fetches demo data because the extension system is being built.  
+- **Details Panel:** Opens as soon as you click a manga card. Currently uses fetches demo data because the plugin system is being built.  
   _> It only changes the tile and cover in the panel to the manga clicked to show it works._
 - **UI:** Clean and functional, but I'm obsessing over small details (like corner radius) as I learn.
 
 ## 🗺️ Roadmap
 
-1. Build the actual **Extension System** (Inspired by Tachiyomi's architecture).
+1. Build the actual **Plugins System** (Inspired by Tachiyomi's extensions architecture).
 2. Finish the **Library Page** (The core feature).
 3. Build the **Reader** and **Settings**. (Vertical focused at first).
 4. Offline Downloads & Auto-updates.
 
 _> Long term dream? Maybe sync/accounts, but that's a long way off._
 
-## ⚡ Future extension system (For Devs)
+## ⚡ Future plugin system (For Devs)
 
-If you want to help grow the app with your own source, the extension system will be open for anyone to build on. It will be inspired by Tachiyomi's architecture, but with a focus on ease of development and security.
+If you want to help grow the app with your own source, the plugin system will be open for anyone to build on. It will be inspired by Tachiyomi's architecture, but with a focus on ease of development and security.
 
-- **Separated Repository:** The extension system will be in its own repo to allow for independent development and versioning as well as to keep the main app on it's own.
-- **Formatting:** Extensions will be built using a standardized format (probably JSON + JavaScript) to ensure compatibility and ease of use.
-- **Security:** Since extensions will run in the main process or the user's system. There will be strict guidelines and reviews for extensions to ensure they are safe and reliable
-- **Documentation:** Comprehensive documentation and examples will be provided to help developers get started with building their own extensions.
+- **Separated Repository:** The plugin system will be in its own repo to allow for independent development and versioning as well as to keep the main app on it's own.
+- **Formatting:** Plugins will be built using a standardized format (probably JSON + JavaScript) to ensure compatibility and ease of use.
+- **Security:** Since plugins will run in the main process or the user's system. There will be strict guidelines and reviews for plugins to ensure they are safe and reliable
+- **Documentation:** Comprehensive documentation and examples will be provided to help developers get started with building their own plugins.
 
 ## ⚠️ The "Developer" Disclaimer
 
