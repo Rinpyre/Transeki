@@ -6,6 +6,31 @@ import { readFileSync } from 'fs'
 const manifestFileNames = ['manifest.json', 'meta.json', 'metadata.json']
 const mainFileNames = ['index.js', 'main.js']
 
+function isValidPluginDirectoryName(name) {
+    // Reject if contains path separators or navigation
+    if (name.includes('/') || name.includes('\\') || name.includes('..')) {
+        return false
+    }
+
+    // Reject if starts with dot (hidden files/folders)
+    if (name.startsWith('.')) {
+        return false
+    }
+
+    // Reject if contains suspicious characters
+    const suspiciousChars = ['<', '>', ':', '"', '|', '?', '*']
+    if (suspiciousChars.some((char) => name.includes(char))) {
+        return false
+    }
+
+    // Must have at least one character
+    if (name.trim().length === 0) {
+        return false
+    }
+
+    return true
+}
+
 function createPlugin(data) {
     return {
         info: data.info || null,
@@ -141,8 +166,14 @@ async function loadPluginContent(pluginPath, pluginName, { manifestFile, mainFil
 
 async function loadSinglePlugin(pluginDir, pluginsPath) {
     const pluginName = pluginDir.name
-    const pluginPath = join(pluginsPath, pluginName)
 
+    // Validate plugin directory name for security
+    if (!isValidPluginDirectoryName(pluginName)) {
+        console.warn(`[Plugins] Skipping '${pluginName}' - invalid directory name (security risk)`)
+        return null
+    }
+
+    const pluginPath = join(pluginsPath, pluginName)
     console.log(`[Plugins]   Checking '${pluginName}' directory...`)
 
     const pluginFiles = await readdir(pluginPath, { withFileTypes: true })
