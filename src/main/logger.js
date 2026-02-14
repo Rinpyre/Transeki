@@ -2,6 +2,7 @@ import winston from 'winston'
 import DailyRotateFile from 'winston-daily-rotate-file'
 import { getFolderPath } from './appDataManager'
 import { join } from 'path'
+import { inspect } from 'util'
 
 let logDir = null
 
@@ -25,10 +26,51 @@ winston.addColors({
 })
 
 // Readable text format (for both files and console)
-const readableFormat = winston.format.printf(({ timestamp, level, message, module }) => {
+const readableFormat = winston.format.printf((info) => {
+    const { timestamp, level, message, module, ...metadata } = info
     const prefix = module ? `[${module}]` : ''
     const levelPadded = level.toUpperCase().padEnd(6)
-    return `[${timestamp}] ${levelPadded} ${prefix} ${message}`
+
+    let output = `[${timestamp}] ${levelPadded} ${prefix} ${message}`
+
+    // Add metadata if present (excluding Winston internals)
+    const filteredMetadata = Object.keys(metadata).filter(
+        (key) => !['level', 'timestamp', 'module'].includes(key) && !key.startsWith('Symbol')
+    )
+
+    if (filteredMetadata.length > 0) {
+        const metaObject = {}
+        filteredMetadata.forEach((key) => {
+            metaObject[key] = metadata[key]
+        })
+        output += ` ${inspect(metaObject, { depth: 3, colors: false, compact: true })}`
+    }
+
+    return output
+})
+
+// Console-specific format with colored metadata
+const consoleFormat = winston.format.printf((info) => {
+    const { timestamp, level, message, module, ...metadata } = info
+    const prefix = module ? `[${module}]` : ''
+    const levelPadded = level.toUpperCase().padEnd(6)
+
+    let output = `[${timestamp}] ${levelPadded} ${prefix} ${message}`
+
+    // Add metadata if present (excluding Winston internals)
+    const filteredMetadata = Object.keys(metadata).filter(
+        (key) => !['level', 'timestamp', 'module'].includes(key) && !key.startsWith('Symbol')
+    )
+
+    if (filteredMetadata.length > 0) {
+        const metaObject = {}
+        filteredMetadata.forEach((key) => {
+            metaObject[key] = metadata[key]
+        })
+        output += ` ${inspect(metaObject, { depth: 3, colors: true, compact: true })}`
+    }
+
+    return output
 })
 
 const baseLogger = winston.createLogger({
@@ -82,7 +124,7 @@ if (process.env.NODE_ENV === 'development') {
         new winston.transports.Console({
             format: winston.format.combine(
                 winston.format.timestamp({ format: 'DD-MM-YYYY HH:mm:ss' }),
-                readableFormat,
+                consoleFormat,
                 winston.format.colorize({ all: true }) // Colors whole line
             )
         })
