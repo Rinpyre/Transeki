@@ -68,26 +68,22 @@ async function initializePluginsFolder() {
 
 async function discoverPluginDirectories() {
     const pluginsPath = getPluginsFolderPath()
-    console.log(`[Plugins] Reading directory: ${pluginsPath}`)
 
     const directories = await readdir(pluginsPath, { withFileTypes: true })
         .then((files) => files.filter((file) => file.isDirectory()))
         .catch((error) => {
-            console.error(`[Plugins] Failed to read plugins directory!`, error)
+            console.error(`[Plugins] Failed to read plugins directory: ${error.message}`)
             return []
         })
 
     if (directories.length === 0) {
-        console.log(`[Plugins] No plugins found in the plugins folder.`)
+        console.log(`[Plugins] No plugin directories found.`)
         return []
     }
 
-    if (process.env.NODE_ENV === 'development') {
-        console.log(`[Plugins] Found ${directories.length} possible plugins:`, directories)
-    } else {
-        console.log(`[Plugins] Found ${directories.length} possible plugins.`)
-    }
-
+    console.log(
+        `[Plugins] Found ${directories.length} possible plugin${directories.length === 1 ? '' : 's'}.`
+    )
     return directories
 }
 
@@ -115,22 +111,17 @@ function findPluginFiles(pluginFiles) {
 async function loadPluginContent(pluginPath, pluginName, { manifestFile, mainFile }) {
     let manifestContent = null
     let mainFileContent = null
+    let manifestError = null
+    let mainFileError = null
 
     // Load manifest content
     if (manifestFile) {
         try {
             const manifestPath = join(pluginPath, manifestFile)
             manifestContent = JSON.parse(readFileSync(manifestPath, 'utf-8'))
-            if (process.env.NODE_ENV === 'development') {
-                console.log(
-                    `[Plugins]   Successfully loaded manifest content for '${pluginName}':`,
-                    manifestContent
-                )
-            } else {
-                console.log(`[Plugins]   Successfully loaded manifest content for '${pluginName}'.`)
-            }
         } catch (error) {
-            console.error(`[Plugins]   Failed to load manifest content for '${pluginName}'!`, error)
+            manifestError = error.message
+            console.error(`[Plugins] Failed to load manifest for '${pluginName}': ${error.message}`)
         }
     }
 
@@ -143,25 +134,20 @@ async function loadPluginContent(pluginPath, pluginName, { manifestFile, mainFil
                 process.platform === 'win32' ? `file://${mainFilePath}` : mainFilePath
             const mainFileRaw = await import(importPath)
             mainFileContent = mainFileRaw.default || mainFileRaw
-            if (process.env.NODE_ENV === 'development') {
-                console.log(
-                    `[Plugins]   Successfully loaded main file content for '${pluginName}':`,
-                    mainFileContent
-                )
-            } else {
-                console.log(
-                    `[Plugins]   Successfully loaded main file content for '${pluginName}'.`
-                )
-            }
         } catch (error) {
+            mainFileError = error.message
             console.error(
-                `[Plugins]   Failed to load main file content for '${pluginName}'!`,
-                error
+                `[Plugins] Failed to load main file for '${pluginName}': ${error.message}`
             )
         }
     }
 
-    return { manifestContent, mainFileContent }
+    return {
+        manifestContent,
+        mainFileContent,
+        success: manifestContent !== null && mainFileContent !== null,
+        error: manifestError || mainFileError
+    }
 }
 
 async function loadSinglePlugin(pluginDir, pluginsPath) {
@@ -169,60 +155,56 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
 
     // Validate plugin directory name for security
     if (!isValidPluginDirectoryName(pluginName)) {
-        console.warn(`[Plugins] Skipping '${pluginName}' - invalid directory name (security risk)`)
-        return null
+        return { plugin: null, reason: 'Invalid directory name (security risk)' }
     }
 
     const pluginPath = join(pluginsPath, pluginName)
-    console.log(`[Plugins]   Checking '${pluginName}' directory...`)
 
-    const pluginFiles = await readdir(pluginPath, { withFileTypes: true })
+    // Read plugin directory with error handling
+    let pluginFiles
+    try {
+        pluginFiles = await readdir(pluginPath, { withFileTypes: true })
+    } catch (error) {
+        console.error(`[Plugins] Failed to read directory '${pluginName}': ${error.message}`)
+        return { plugin: null, reason: `Cannot read directory: ${error.message}` }
+    }
+
     const { manifestFile, mainFile, iconFile } = findPluginFiles(pluginFiles)
 
-    // Log found files
-    if (!manifestFile) {
-        console.warn(`[Plugins]   No manifest found in '${pluginName}'.`)
-    } else {
-        console.log(`[Plugins]   Found manifest '${manifestFile}' in '${pluginName}'`)
-    }
-
-    if (!mainFile) {
-        console.warn(`[Plugins]   No main file found in '${pluginName}'.`)
-    } else {
-        console.log(`[Plugins]   Found main file '${mainFile}' in '${pluginName}'`)
-    }
-
-    if (iconFile) {
-        console.log(`[Plugins]   Found icon file '${iconFile.name}' in '${pluginName}'`)
-    } else {
-        console.log(`[Plugins]   No icon file found in '${pluginName}' (optional).`)
-    }
-
     // Validate required files
-    if (!manifestFile || !mainFile) {
-        console.warn(
-            `[Plugins] Folder '${pluginName}' is missing required files and will be skipped.`
+    if (!manifestFile) {
+        return { plugin: null, reason: 'Missing manifest file' }
+    }
+    if (!mainFile) {
+        return { plugin: null, reason: 'Missing main file' }
+    }
+
+    // Development-only detailed logging
+    if (process.env.NODE_ENV === 'development') {
+        console.log(
+            `[Plugins]   '${pluginName}': manifest=${manifestFile}, main=${mainFile}, icon=${iconFile?.name || 'none'}`
         )
-        return null
     }
 
     // Load file contents
-    const { manifestContent, mainFileContent } = await loadPluginContent(pluginPath, pluginName, {
+    const loadResult = await loadPluginContent(pluginPath, pluginName, {
         manifestFile,
         mainFile
     })
 
+    if (!loadResult.success) {
+        return { plugin: null, reason: loadResult.error || 'Failed to load content' }
+    }
+
     // Create plugin object
-    console.log(`[Plugins] Folder '${pluginName}' is a valid plugin!`)
     const iconPath = iconFile ? `file://${join(pluginPath, iconFile.name)}` : null
     const plugin = createPlugin({
-        info: manifestContent,
+        info: loadResult.manifestContent,
         icon: iconPath,
-        actions: mainFileContent
+        actions: loadResult.mainFileContent
     })
 
-    console.log(`[Plugins] Loaded plugin '${pluginName}':`, plugin)
-    return plugin
+    return { plugin, reason: null }
 }
 
 async function loadPlugins() {
@@ -234,21 +216,26 @@ async function loadPlugins() {
     }
 
     const pluginsPath = getPluginsFolderPath()
-    console.log(`[Plugins] Starting to check plugins...`)
-
     const loadedPlugins = []
+    const failures = []
+
     for (const pluginDir of possiblePlugins) {
-        const plugin = await loadSinglePlugin(pluginDir, pluginsPath)
+        const { plugin, reason } = await loadSinglePlugin(pluginDir, pluginsPath)
         if (plugin) {
             loadedPlugins.push(plugin)
+            console.log(`[Plugins] ✓ Loaded '${pluginDir.name}'`)
+        } else {
+            failures.push({ name: pluginDir.name, reason })
+            console.warn(`[Plugins] ✗ Failed '${pluginDir.name}': ${reason}`)
         }
     }
 
-    console.log(`[Plugins] Loaded ${loadedPlugins.length} plugins.`)
-    if (loadedPlugins.length < possiblePlugins.length) {
-        console.warn(
-            `[Plugins] There have been discovered other ${possiblePlugins.length - loadedPlugins.length} folders that were not valid plugins!`
-        )
+    // Summary
+    console.log(
+        `[Plugins] Successfully loaded ${loadedPlugins.length}/${possiblePlugins.length} plugins.`
+    )
+    if (failures.length > 0 && process.env.NODE_ENV === 'development') {
+        console.log('[Plugins] Failed plugins:', failures)
     }
 
     return loadedPlugins
