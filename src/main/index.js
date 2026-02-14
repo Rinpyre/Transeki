@@ -3,6 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
 import { initializeAppData, getAppDataPath, getFolderPath } from './appDataManager.js'
+import { initializePluginsFolder, loadPlugins } from './extensionsManager.js'
 
 function createWindow() {
     // Create the browser window.
@@ -41,7 +42,7 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     // Set app user model id for windows
     electronApp.setAppUserModelId('com.rinpyre.transeki')
 
@@ -49,9 +50,20 @@ app.whenReady().then(() => {
     Menu.setApplicationMenu(null)
 
     // Initialize appdata directory structure
-    initializeAppData().catch((error) => {
+    await initializeAppData().catch((error) => {
         console.error('Failed to initialize appdata:', error)
     })
+
+    // Load plugins
+    // We don't await this because we want the app to load as fast as possible and plugins can be loaded in the background
+    initializePluginsFolder()
+        .then(() => loadPlugins())
+        .then((plugins) => {
+            console.log(`[Plugins] Successfully loaded ${plugins.length} plugins!`)
+        })
+        .catch((error) => {
+            console.error('[Plugins] Failed to load plugins:', error)
+        })
 
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.
