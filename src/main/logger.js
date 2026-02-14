@@ -3,7 +3,18 @@ import DailyRotateFile from 'winston-daily-rotate-file'
 import { getFolderPath } from './appDataManager'
 import { join } from 'path'
 
-const logDir = join(getFolderPath('logs'))
+let logDir = null
+
+/**
+ * Lazy initialization of log directory path
+ * Prevents circular dependency by deferring getFolderPath() call
+ */
+function getLogDir() {
+    if (!logDir) {
+        logDir = join(getFolderPath('logs'))
+    }
+    return logDir
+}
 
 // Define custom colors
 winston.addColors({
@@ -25,7 +36,7 @@ const baseLogger = winston.createLogger({
     transports: [
         // Errors only - keep for 30 days
         new DailyRotateFile({
-            dirname: logDir,
+            dirname: getLogDir(),
             filename: 'error-%DATE%.log',
             datePattern: 'YYYY-MM-DD',
             level: 'error',
@@ -39,7 +50,7 @@ const baseLogger = winston.createLogger({
         }),
         // Combined logs (JSON) - keep for 7 days
         new DailyRotateFile({
-            dirname: logDir,
+            dirname: getLogDir(),
             filename: 'transeki-%DATE%.jsonl',
             datePattern: 'YYYY-MM-DD',
             maxSize: '10m',
@@ -52,7 +63,7 @@ const baseLogger = winston.createLogger({
         }),
         // Combined logs (readable format) - keep for 7 days
         new DailyRotateFile({
-            dirname: logDir,
+            dirname: getLogDir(),
             filename: 'transeki-%DATE%.log',
             datePattern: 'YYYY-MM-DD',
             maxSize: '10m',
