@@ -7,7 +7,8 @@ const FOLDERS = {
     DB: 'db',
     CONFIG: 'config',
     SETTINGS: 'settings',
-    PLUGINS: 'plugins'
+    PLUGINS: 'plugins',
+    LOGS: 'logs'
 }
 
 /**
