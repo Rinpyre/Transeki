@@ -4,6 +4,9 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
 import { initializeAppData, getAppDataPath, getFolderPath } from './appDataManager.js'
 import { initializePluginsFolder, loadPlugins } from './pluginManager.js'
+import { createModuleLogger } from './logger.js'
+
+const logger = createModuleLogger('Main')
 
 function createWindow() {
     // Create the browser window.
@@ -53,6 +56,10 @@ app.whenReady().then(async () => {
     await initializeAppData().catch((error) => {
         console.error('Failed to initialize appdata:', error)
     })
+
+    // Now logger can safely write to files
+    logger.info('Application started successfully')
+    logger.info('AppData initialization complete')
 
     // Load plugins
     // We don't await this because we want the app to load as fast as possible and plugins can be loaded in the background
