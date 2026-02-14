@@ -234,7 +234,7 @@ async function loadPlugins() {
     // Summary
     logger.info(`Successfully loaded ${loadedPlugins.length}/${possiblePlugins.length} plugins.`)
     if (failures.length > 0 && process.env.NODE_ENV === 'development') {
-        logger.debug('Failed plugins:', failures)
+        logger.debug('Failed plugins:', { failures })
     }
 
     return loadedPlugins

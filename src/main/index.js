@@ -66,10 +66,13 @@ app.whenReady().then(async () => {
     initializePluginsFolder()
         .then(() => loadPlugins())
         .then((plugins) => {
-            console.log(`[Plugins] Successfully loaded ${plugins.length} plugins!`)
+            logger.info(`Successfully loaded ${plugins.length} plugins!`)
+            if (plugins.length > 0 && process.env.NODE_ENV === 'development') {
+                logger.debug('Loaded plugins:', { plugins: plugins.map((p) => p.info.name) })
+            }
         })
         .catch((error) => {
-            console.error('[Plugins] Failed to load plugins:', error)
+            logger.error('Failed to load plugins:', error)
         })
 
     // Default open or close DevTools by F12 in development
