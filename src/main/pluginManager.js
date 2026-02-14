@@ -1,7 +1,10 @@
 import { getFolderPath } from './appDataManager'
+import { createModuleLogger } from './logger'
 import { join } from 'path'
 import { mkdir, stat, readdir } from 'fs/promises'
 import { readFileSync } from 'fs'
+
+const logger = createModuleLogger('Plugins')
 
 const manifestFileNames = ['manifest.json', 'meta.json', 'metadata.json']
 const mainFileNames = ['index.js', 'main.js']
@@ -49,18 +52,18 @@ function getPluginsFolderPath() {
 
 async function initializePluginsFolder() {
     const pluginsPath = getPluginsFolderPath()
-    console.log(`[Plugins] Checking plugins folder at: ${pluginsPath}`)
+    logger.info(`Checking plugins folder at: ${pluginsPath}`)
 
     try {
         await stat(pluginsPath)
-        console.log(`[Plugins] Plugins folder found!`)
+        logger.info(`Plugins folder found!`)
     } catch {
-        console.warn(`[Plugins] Plugins folder not found! Attempting to create it...`)
+        logger.warn(`Plugins folder not found! Attempting to create it...`)
         try {
             await mkdir(pluginsPath, { recursive: true })
-            console.log(`[Plugins]  Created plugins folder.`)
+            logger.info(`Created plugins folder.`)
         } catch (mkdirError) {
-            console.error(`[Plugins] Failed to create plugins folder!`, mkdirError)
+            logger.error(`Failed to create plugins folder!`, mkdirError)
             return
         }
     }
@@ -72,17 +75,17 @@ async function discoverPluginDirectories() {
     const directories = await readdir(pluginsPath, { withFileTypes: true })
         .then((files) => files.filter((file) => file.isDirectory()))
         .catch((error) => {
-            console.error(`[Plugins] Failed to read plugins directory: ${error.message}`)
+            logger.error(`Failed to read plugins directory: ${error.message}`)
             return []
         })
 
     if (directories.length === 0) {
-        console.log(`[Plugins] No plugin directories found.`)
+        logger.info(`No plugin directories found.`)
         return []
     }
 
-    console.log(
-        `[Plugins] Found ${directories.length} possible plugin${directories.length === 1 ? '' : 's'}.`
+    logger.info(
+        `Found ${directories.length} possible plugin${directories.length === 1 ? '' : 's'}.`
     )
     return directories
 }
@@ -121,7 +124,7 @@ async function loadPluginContent(pluginPath, pluginName, { manifestFile, mainFil
             manifestContent = JSON.parse(readFileSync(manifestPath, 'utf-8'))
         } catch (error) {
             manifestError = error.message
-            console.error(`[Plugins] Failed to load manifest for '${pluginName}': ${error.message}`)
+            logger.error(`Failed to load manifest for '${pluginName}': ${error.message}`)
         }
     }
 
@@ -136,9 +139,7 @@ async function loadPluginContent(pluginPath, pluginName, { manifestFile, mainFil
             mainFileContent = mainFileRaw.default || mainFileRaw
         } catch (error) {
             mainFileError = error.message
-            console.error(
-                `[Plugins] Failed to load main file for '${pluginName}': ${error.message}`
-            )
+            logger.error(`Failed to load main file for '${pluginName}': ${error.message}`)
         }
     }
 
@@ -165,7 +166,7 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
     try {
         pluginFiles = await readdir(pluginPath, { withFileTypes: true })
     } catch (error) {
-        console.error(`[Plugins] Failed to read directory '${pluginName}': ${error.message}`)
+        logger.error(`Failed to read directory '${pluginName}': ${error.message}`)
         return { plugin: null, reason: `Cannot read directory: ${error.message}` }
     }
 
@@ -181,8 +182,8 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
 
     // Development-only detailed logging
     if (process.env.NODE_ENV === 'development') {
-        console.log(
-            `[Plugins]   '${pluginName}': manifest=${manifestFile}, main=${mainFile}, icon=${iconFile?.name || 'none'}`
+        logger.debug(
+            `'${pluginName}': manifest=${manifestFile}, main=${mainFile}, icon=${iconFile?.name || 'none'}`
         )
     }
 
@@ -208,7 +209,7 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
 }
 
 async function loadPlugins() {
-    console.log('[Plugins] Loading plugins...')
+    logger.info('Loading plugins...')
 
     const possiblePlugins = await discoverPluginDirectories()
     if (possiblePlugins.length === 0) {
@@ -223,19 +224,17 @@ async function loadPlugins() {
         const { plugin, reason } = await loadSinglePlugin(pluginDir, pluginsPath)
         if (plugin) {
             loadedPlugins.push(plugin)
-            console.log(`[Plugins] ✓ Loaded '${pluginDir.name}'`)
+            logger.info(`[OK] Loaded '${pluginDir.name}'`)
         } else {
             failures.push({ name: pluginDir.name, reason })
-            console.warn(`[Plugins] ✗ Failed '${pluginDir.name}': ${reason}`)
+            logger.warn(`[X] Failed '${pluginDir.name}': ${reason}`)
         }
     }
 
     // Summary
-    console.log(
-        `[Plugins] Successfully loaded ${loadedPlugins.length}/${possiblePlugins.length} plugins.`
-    )
+    logger.info(`Successfully loaded ${loadedPlugins.length}/${possiblePlugins.length} plugins.`)
     if (failures.length > 0 && process.env.NODE_ENV === 'development') {
-        console.log('[Plugins] Failed plugins:', failures)
+        logger.debug('Failed plugins:', failures)
     }
 
     return loadedPlugins
