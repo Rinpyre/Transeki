@@ -88,6 +88,13 @@ function validateManifest(manifest) {
         }
     }
 
+    // apiVersion: required, positive integer
+    if (manifest.apiVersion === undefined) {
+        errors.push('missing required field: apiVersion')
+    } else if (!Number.isInteger(manifest.apiVersion) || manifest.apiVersion < 1) {
+        errors.push('apiVersion must be a positive integer (e.g. 1)')
+    }
+
     // description, author: optional strings
     for (const field of ['description', 'author']) {
         if (manifest[field] !== undefined && typeof manifest[field] !== 'string') {
