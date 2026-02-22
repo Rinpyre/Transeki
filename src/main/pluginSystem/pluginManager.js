@@ -147,7 +147,7 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
     // Warn if plugin targets a different API version
     if (manifest.apiVersion !== CURRENT_API_VERSION) {
         logger.warn(
-            `[API] '${manifest.id}' targets apiVersion ${manifest.apiVersion}, current is ${CURRENT_API_VERSION} — plugin may be incompatible`
+            `[API] '${manifest.id}' targets apiVersion ${manifest.apiVersion}, current is ${CURRENT_API_VERSION} - plugin may be incompatible`
         )
     }
 
