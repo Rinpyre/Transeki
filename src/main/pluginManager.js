@@ -1,38 +1,138 @@
 import { getFolderPath } from './appDataManager'
 import { createModuleLogger } from './logger'
 import { join } from 'path'
-import { mkdir, stat, readdir } from 'fs/promises'
-import { readFileSync } from 'fs'
+import { mkdir, stat, readdir, readFile } from 'fs/promises'
+import axios from 'axios'
 
 const logger = createModuleLogger('Plugins')
 
 const manifestFileNames = ['manifest.json', 'meta.json', 'metadata.json']
 const mainFileNames = ['index.js', 'main.js']
+const iconFileNames = ['icon.png']
+
+const pluginRegistry = new Map()
+
+// --- Validation ---
 
 function isValidPluginDirectoryName(name) {
-    // Reject if contains path separators or navigation
-    if (name.includes('/') || name.includes('\\') || name.includes('..')) {
-        return false
-    }
-
-    // Reject if starts with dot (hidden files/folders)
-    if (name.startsWith('.')) {
-        return false
-    }
-
-    // Reject if contains suspicious characters
+    if (name.includes('/') || name.includes('\\') || name.includes('..')) return false
+    if (name.startsWith('.')) return false
     const suspiciousChars = ['<', '>', ':', '"', '|', '?', '*']
-    if (suspiciousChars.some((char) => name.includes(char))) {
-        return false
-    }
-
-    // Must have at least one character
-    if (name.trim().length === 0) {
-        return false
-    }
-
+    if (suspiciousChars.some((char) => name.includes(char))) return false
+    if (name.trim().length === 0) return false
     return true
 }
+
+function validateManifest(manifest) {
+    const errors = []
+
+    if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
+        return { valid: false, errors: ['manifest must be a JSON object'] }
+    }
+
+    // id: required, reverse-domain format (e.g. com.author.plugin-name)
+    if (!manifest.id || typeof manifest.id !== 'string') {
+        errors.push('missing required field: id')
+    } else if (!/^[a-z0-9]+(\.[a-z0-9-]+)+$/.test(manifest.id)) {
+        errors.push('id must be in reverse-domain format (e.g. com.author.plugin-name)')
+    }
+
+    // name: required, non-empty string
+    if (!manifest.name || typeof manifest.name !== 'string' || manifest.name.trim().length === 0) {
+        errors.push('missing required field: name')
+    }
+
+    // version: required, semver (x.y.z)
+    if (!manifest.version || typeof manifest.version !== 'string') {
+        errors.push('missing required field: version')
+    } else if (!/^\d+\.\d+\.\d+$/.test(manifest.version)) {
+        errors.push('version must use semver format (e.g. 1.0.0)')
+    }
+
+    // main: optional — if present, must be a safe .js filename
+    if (manifest.main !== undefined) {
+        if (typeof manifest.main !== 'string' || manifest.main.trim().length === 0) {
+            errors.push('main must be a non-empty string if specified')
+        } else if (!manifest.main.endsWith('.js')) {
+            errors.push('main must end with .js')
+        } else if (
+            manifest.main.includes('/') ||
+            manifest.main.includes('\\') ||
+            manifest.main.includes('..')
+        ) {
+            errors.push('main must be a filename only (no path separators or ..)')
+        }
+    }
+
+    // icon: optional — if present, must be a safe filename
+    if (manifest.icon !== undefined) {
+        if (typeof manifest.icon !== 'string' || manifest.icon.trim().length === 0) {
+            errors.push('icon must be a non-empty string if specified')
+        } else if (
+            manifest.icon.includes('/') ||
+            manifest.icon.includes('\\') ||
+            manifest.icon.includes('..')
+        ) {
+            errors.push('icon must be a filename only (no path separators or ..)')
+        }
+    }
+
+    // description, author: optional strings
+    for (const field of ['description', 'author']) {
+        if (manifest[field] !== undefined && typeof manifest[field] !== 'string') {
+            errors.push(`${field} must be a string if specified`)
+        }
+    }
+
+    return { valid: errors.length === 0, errors }
+}
+
+const BLOCKED_PATTERNS = [
+    {
+        pattern: /child_process/,
+        message: "use of 'child_process' is not allowed"
+    },
+    {
+        pattern: /\beval\s*\(/,
+        message: 'use of eval() is not allowed'
+    },
+    {
+        pattern: /new\s+Function\s*\(/,
+        message: 'use of new Function() is not allowed'
+    },
+    {
+        pattern: /(?:require|import)\s*\(\s*['"]fs['"]\s*\)|from\s+['"]fs['"]|import\s+['"]fs['"]/,
+        message: "direct filesystem access via 'fs' module is not allowed"
+    },
+    {
+        pattern:
+            /(?:require|import)\s*\(\s*['"](?:http|https|net|dgram)['"]\s*\)|from\s+['"](?:http|https|net|dgram)['"]|import\s+['"](?:http|https|net|dgram)['"]/,
+        message:
+            'direct network access via built-in modules is not allowed (use modules.axios instead)'
+    }
+]
+
+function scanPluginSource(sourceCode, pluginId) {
+    const violations = []
+    for (const { pattern, message } of BLOCKED_PATTERNS) {
+        if (pattern.test(sourceCode)) {
+            violations.push(message)
+        }
+    }
+    if (violations.length > 0) {
+        logger.warn(`[SCAN] '${pluginId}' blocked — security violations detected:`)
+        for (const v of violations) logger.warn(`  - ${v}`)
+    }
+    return { safe: violations.length === 0, violations }
+}
+
+function validatePluginExports(exports) {
+    const required = ['search', 'getManga', 'getChapter']
+    const missing = required.filter((fn) => typeof exports[fn] !== 'function')
+    return { valid: missing.length === 0, missing }
+}
+
+// --- Plugin construction ---
 
 function createPlugin(data) {
     return {
@@ -46,6 +146,32 @@ function createPlugin(data) {
     }
 }
 
+// --- Module injection ---
+
+// Plugin calling convention:
+//   plugin.actions.search(query, modules)
+//   plugin.actions.getManga(id, modules)
+//   plugin.actions.getChapter(id, chapterNum, modules)
+function createPluginModules() {
+    return { axios }
+}
+
+// --- Registry accessors ---
+
+function getPlugin(id) {
+    return pluginRegistry.get(id) || null
+}
+
+function getAllPlugins() {
+    return Array.from(pluginRegistry.values())
+}
+
+function getPluginIds() {
+    return Array.from(pluginRegistry.keys())
+}
+
+// --- Core loading ---
+
 function getPluginsFolderPath() {
     return getFolderPath('plugins')
 }
@@ -56,15 +182,14 @@ async function initializePluginsFolder() {
 
     try {
         await stat(pluginsPath)
-        logger.info(`Plugins folder found!`)
+        logger.info('Plugins folder found!')
     } catch {
-        logger.warn(`Plugins folder not found! Attempting to create it...`)
+        logger.warn('Plugins folder not found! Attempting to create it...')
         try {
             await mkdir(pluginsPath, { recursive: true })
-            logger.info(`Created plugins folder.`)
+            logger.info('Created plugins folder.')
         } catch (mkdirError) {
-            logger.error(`Failed to create plugins folder!`, mkdirError)
-            return
+            logger.error('Failed to create plugins folder!', mkdirError)
         }
     }
 }
@@ -80,7 +205,7 @@ async function discoverPluginDirectories() {
         })
 
     if (directories.length === 0) {
-        logger.info(`No plugin directories found.`)
+        logger.info('No plugin directories found.')
         return []
     }
 
@@ -90,131 +215,119 @@ async function discoverPluginDirectories() {
     return directories
 }
 
-function findPluginFiles(pluginFiles) {
-    const manifestFile = manifestFileNames.find((manifestFileName) =>
-        pluginFiles.some((file) => file.isFile() && file.name === manifestFileName)
-    )
-
-    const mainFile = mainFileNames.find((mainFileName) =>
-        pluginFiles.some((file) => file.isFile() && file.name === mainFileName)
-    )
-
-    const iconFile = pluginFiles.find(
-        (file) =>
-            file.isFile() &&
-            file.name.toLowerCase().startsWith('icon') &&
-            ['.png', '.jpg', '.jpeg', '.svg', '.webp'].some((ext) =>
-                file.name.toLowerCase().endsWith(ext)
-            )
-    )
-
-    return { manifestFile, mainFile, iconFile }
-}
-
-async function loadPluginContent(pluginPath, pluginName, { manifestFile, mainFile }) {
-    let manifestContent = null
-    let mainFileContent = null
-    let manifestError = null
-    let mainFileError = null
-
-    // Load manifest content
-    if (manifestFile) {
-        try {
-            const manifestPath = join(pluginPath, manifestFile)
-            manifestContent = JSON.parse(readFileSync(manifestPath, 'utf-8'))
-        } catch (error) {
-            manifestError = error.message
-            logger.error(`Failed to load manifest for '${pluginName}': ${error.message}`)
-        }
-    }
-
-    // Load main file content
-    if (mainFile) {
-        try {
-            const mainFilePath = join(pluginPath, mainFile)
-            // On Windows, convert the path to a file URL to import it correctly, especially if it contains spaces
-            const importPath =
-                process.platform === 'win32' ? `file://${mainFilePath}` : mainFilePath
-            const mainFileRaw = await import(importPath)
-            mainFileContent = mainFileRaw.default || mainFileRaw
-        } catch (error) {
-            mainFileError = error.message
-            logger.error(`Failed to load main file for '${pluginName}': ${error.message}`)
-        }
-    }
-
-    return {
-        manifestContent,
-        mainFileContent,
-        success: manifestContent !== null && mainFileContent !== null,
-        error: manifestError || mainFileError
-    }
-}
-
 async function loadSinglePlugin(pluginDir, pluginsPath) {
-    const pluginName = pluginDir.name
+    const folderName = pluginDir.name
 
-    // Validate plugin directory name for security
-    if (!isValidPluginDirectoryName(pluginName)) {
+    if (!isValidPluginDirectoryName(folderName)) {
         return { plugin: null, reason: 'Invalid directory name (security risk)' }
     }
 
-    const pluginPath = join(pluginsPath, pluginName)
+    const pluginPath = join(pluginsPath, folderName)
 
-    // Read plugin directory with error handling
     let pluginFiles
     try {
         pluginFiles = await readdir(pluginPath, { withFileTypes: true })
     } catch (error) {
-        logger.error(`Failed to read directory '${pluginName}': ${error.message}`)
         return { plugin: null, reason: `Cannot read directory: ${error.message}` }
     }
 
-    const { manifestFile, mainFile, iconFile } = findPluginFiles(pluginFiles)
-
-    // Validate required files
-    if (!manifestFile) {
+    // Find manifest file by name list
+    const manifestFileName = manifestFileNames.find((name) =>
+        pluginFiles.some((f) => f.isFile() && f.name === name)
+    )
+    if (!manifestFileName) {
         return { plugin: null, reason: 'Missing manifest file' }
     }
-    if (!mainFile) {
-        return { plugin: null, reason: 'Missing main file' }
+
+    // Load and parse manifest
+    let manifest
+    try {
+        manifest = JSON.parse(await readFile(join(pluginPath, manifestFileName), 'utf-8'))
+    } catch (error) {
+        return { plugin: null, reason: `Failed to parse manifest: ${error.message}` }
     }
 
-    // Development-only detailed logging
-    if (process.env.NODE_ENV === 'development') {
-        logger.debug(
-            `'${pluginName}': manifest=${manifestFile}, main=${mainFile}, icon=${iconFile?.name || 'none'}`
-        )
+    // Validate manifest schema
+    const { valid, errors } = validateManifest(manifest)
+    if (!valid) {
+        return { plugin: null, reason: `Invalid manifest: ${errors.join(', ')}` }
     }
 
-    // Load file contents
-    const loadResult = await loadPluginContent(pluginPath, pluginName, {
-        manifestFile,
-        mainFile
-    })
-
-    if (!loadResult.success) {
-        return { plugin: null, reason: loadResult.error || 'Failed to load content' }
+    // Resolve main file (manifest.main takes priority, fallback to default list)
+    const mainCandidates = manifest.main
+        ? [manifest.main, ...mainFileNames.filter((n) => n !== manifest.main)]
+        : mainFileNames
+    const mainFileName = mainCandidates.find((name) =>
+        pluginFiles.some((f) => f.isFile() && f.name === name)
+    )
+    if (!mainFileName) {
+        return { plugin: null, reason: `Missing main file (tried: ${mainCandidates.join(', ')})` }
     }
 
-    // Create plugin object
-    const iconPath = iconFile ? `file://${join(pluginPath, iconFile.name)}` : null
+    // Scan source code for security violations
+    let sourceCode
+    try {
+        sourceCode = await readFile(join(pluginPath, mainFileName), 'utf-8')
+    } catch (error) {
+        return { plugin: null, reason: `Failed to read main file: ${error.message}` }
+    }
+
+    const scanResult = scanPluginSource(sourceCode, manifest.id)
+    if (!scanResult.safe) {
+        return { plugin: null, reason: `Security violations: ${scanResult.violations.join(', ')}` }
+    }
+
+    // Import the main file
+    let pluginExports
+    try {
+        const mainFilePath = join(pluginPath, mainFileName)
+        // On Windows, convert the path to a file URL to handle spaces and other special chars correctly
+        const importPath = process.platform === 'win32' ? `file://${mainFilePath}` : mainFilePath
+        const raw = await import(importPath)
+        pluginExports = raw.default || raw
+    } catch (error) {
+        return { plugin: null, reason: `Failed to import main file: ${error.message}` }
+    }
+
+    // Validate exported API surface
+    const { valid: exportsValid, missing } = validatePluginExports(pluginExports)
+    if (!exportsValid) {
+        return { plugin: null, reason: `Missing required exports: ${missing.join(', ')}` }
+    }
+
+    // Resolve icon file (manifest.icon takes priority, fallback to default list)
+    const iconCandidates = manifest.icon
+        ? [manifest.icon, ...iconFileNames.filter((n) => n !== manifest.icon)]
+        : iconFileNames
+    const iconFileName =
+        iconCandidates.find((name) => pluginFiles.some((f) => f.isFile() && f.name === name)) ||
+        null
+
+    // Assemble plugin object
+    const iconPath = iconFileName ? `file://${join(pluginPath, iconFileName)}` : null
     const plugin = createPlugin({
-        info: loadResult.manifestContent,
+        info: manifest,
         icon: iconPath,
-        actions: loadResult.mainFileContent
+        actions: pluginExports
     })
+
+    if (process.env.NODE_ENV === 'development') {
+        logger.debug(`Loaded plugin [${manifest.id}] with files:`, {
+            manifest: manifestFileName,
+            main: mainFileName,
+            icon: iconFileName || 'none'
+        })
+    }
 
     return { plugin, reason: null }
 }
 
 async function loadPlugins() {
     logger.info('Loading plugins...')
+    pluginRegistry.clear()
 
     const possiblePlugins = await discoverPluginDirectories()
-    if (possiblePlugins.length === 0) {
-        return []
-    }
+    if (possiblePlugins.length === 0) return []
 
     const pluginsPath = getPluginsFolderPath()
     const loadedPlugins = []
@@ -223,15 +336,23 @@ async function loadPlugins() {
     for (const pluginDir of possiblePlugins) {
         const { plugin, reason } = await loadSinglePlugin(pluginDir, pluginsPath)
         if (plugin) {
-            loadedPlugins.push(plugin)
-            logger.info(`[OK] Loaded '${pluginDir.name}'`)
+            const pluginId = plugin.info.id
+            if (pluginRegistry.has(pluginId)) {
+                logger.warn(
+                    `[SKIP] Duplicate plugin ID '${pluginId}' in folder '${pluginDir.name}', skipping.`
+                )
+                failures.push({ name: pluginDir.name, reason: `Duplicate plugin ID: ${pluginId}` })
+            } else {
+                pluginRegistry.set(pluginId, plugin)
+                loadedPlugins.push(plugin)
+                logger.info(`[OK] Loaded [${pluginId}] from {${pluginDir.name}}`)
+            }
         } else {
             failures.push({ name: pluginDir.name, reason })
-            logger.warn(`[X] Failed '${pluginDir.name}': ${reason}`)
+            logger.warn(`[X] Failed to load [${pluginDir.name}]: ${reason}`)
         }
     }
 
-    // Summary
     logger.info(`Successfully loaded ${loadedPlugins.length}/${possiblePlugins.length} plugins.`)
     if (failures.length > 0 && process.env.NODE_ENV === 'development') {
         logger.debug('Failed plugins:', { failures })
@@ -240,4 +361,12 @@ async function loadPlugins() {
     return loadedPlugins
 }
 
-export { getPluginsFolderPath, initializePluginsFolder, loadPlugins }
+export {
+    getPluginsFolderPath,
+    initializePluginsFolder,
+    loadPlugins,
+    getPlugin,
+    getAllPlugins,
+    getPluginIds,
+    createPluginModules
+}
