@@ -1,8 +1,14 @@
-import { getFolderPath } from './appDataManager'
-import { createModuleLogger } from './logger'
+import { getFolderPath } from '../appDataManager'
+import { createModuleLogger } from '../logger'
 import { join } from 'path'
 import { mkdir, stat, readdir, readFile } from 'fs/promises'
 import axios from 'axios'
+import {
+    isValidPluginDirectoryName,
+    validateManifest,
+    validatePluginSource,
+    validatePluginExports
+} from './pluginValidator'
 
 const logger = createModuleLogger('Plugins')
 
@@ -12,136 +18,16 @@ const iconFileNames = ['icon.png']
 
 const pluginRegistry = new Map()
 
-// --- Validation ---
-
-function isValidPluginDirectoryName(name) {
-    if (name.includes('/') || name.includes('\\') || name.includes('..')) return false
-    if (name.startsWith('.')) return false
-    const suspiciousChars = ['<', '>', ':', '"', '|', '?', '*']
-    if (suspiciousChars.some((char) => name.includes(char))) return false
-    if (name.trim().length === 0) return false
-    return true
-}
-
-function validateManifest(manifest) {
-    const errors = []
-
-    if (!manifest || typeof manifest !== 'object' || Array.isArray(manifest)) {
-        return { valid: false, errors: ['manifest must be a JSON object'] }
-    }
-
-    // id: required, reverse-domain format (e.g. com.author.plugin-name)
-    if (!manifest.id || typeof manifest.id !== 'string') {
-        errors.push('missing required field: id')
-    } else if (!/^[a-z0-9]+(\.[a-z0-9-]+)+$/.test(manifest.id)) {
-        errors.push('id must be in reverse-domain format (e.g. com.author.plugin-name)')
-    }
-
-    // name: required, non-empty string
-    if (!manifest.name || typeof manifest.name !== 'string' || manifest.name.trim().length === 0) {
-        errors.push('missing required field: name')
-    }
-
-    // version: required, semver (x.y.z)
-    if (!manifest.version || typeof manifest.version !== 'string') {
-        errors.push('missing required field: version')
-    } else if (!/^\d+\.\d+\.\d+$/.test(manifest.version)) {
-        errors.push('version must use semver format (e.g. 1.0.0)')
-    }
-
-    // main: optional — if present, must be a safe .js filename
-    if (manifest.main !== undefined) {
-        if (typeof manifest.main !== 'string' || manifest.main.trim().length === 0) {
-            errors.push('main must be a non-empty string if specified')
-        } else if (!manifest.main.endsWith('.js')) {
-            errors.push('main must end with .js')
-        } else if (
-            manifest.main.includes('/') ||
-            manifest.main.includes('\\') ||
-            manifest.main.includes('..')
-        ) {
-            errors.push('main must be a filename only (no path separators or ..)')
-        }
-    }
-
-    // icon: optional — if present, must be a safe filename
-    if (manifest.icon !== undefined) {
-        if (typeof manifest.icon !== 'string' || manifest.icon.trim().length === 0) {
-            errors.push('icon must be a non-empty string if specified')
-        } else if (
-            manifest.icon.includes('/') ||
-            manifest.icon.includes('\\') ||
-            manifest.icon.includes('..')
-        ) {
-            errors.push('icon must be a filename only (no path separators or ..)')
-        }
-    }
-
-    // description, author: optional strings
-    for (const field of ['description', 'author']) {
-        if (manifest[field] !== undefined && typeof manifest[field] !== 'string') {
-            errors.push(`${field} must be a string if specified`)
-        }
-    }
-
-    return { valid: errors.length === 0, errors }
-}
-
-const BLOCKED_PATTERNS = [
-    {
-        pattern: /child_process/,
-        message: "use of 'child_process' is not allowed"
-    },
-    {
-        pattern: /\beval\s*\(/,
-        message: 'use of eval() is not allowed'
-    },
-    {
-        pattern: /new\s+Function\s*\(/,
-        message: 'use of new Function() is not allowed'
-    },
-    {
-        pattern: /(?:require|import)\s*\(\s*['"]fs['"]\s*\)|from\s+['"]fs['"]|import\s+['"]fs['"]/,
-        message: "direct filesystem access via 'fs' module is not allowed"
-    },
-    {
-        pattern:
-            /(?:require|import)\s*\(\s*['"](?:http|https|net|dgram)['"]\s*\)|from\s+['"](?:http|https|net|dgram)['"]|import\s+['"](?:http|https|net|dgram)['"]/,
-        message:
-            'direct network access via built-in modules is not allowed (use modules.axios instead)'
-    }
-]
-
-function scanPluginSource(sourceCode, pluginId) {
-    const violations = []
-    for (const { pattern, message } of BLOCKED_PATTERNS) {
-        if (pattern.test(sourceCode)) {
-            violations.push(message)
-        }
-    }
-    if (violations.length > 0) {
-        logger.warn(`[SCAN] '${pluginId}' blocked — security violations detected:`)
-        for (const v of violations) logger.warn(`  - ${v}`)
-    }
-    return { safe: violations.length === 0, violations }
-}
-
-function validatePluginExports(exports) {
-    const required = ['search', 'getManga', 'getChapter']
-    const missing = required.filter((fn) => typeof exports[fn] !== 'function')
-    return { valid: missing.length === 0, missing }
-}
-
 // --- Plugin construction ---
 
 function createPlugin(data) {
     return {
-        info: data.info || null,
-        icon: data.icon || null,
+        info: data.info ?? null,
+        icon: data.icon ?? null,
         actions: {
-            search: data.actions?.search || null,
-            getManga: data.actions?.getManga || null,
-            getChapter: data.actions?.getChapter || null
+            search: data.actions?.search ?? null,
+            getManga: data.actions?.getManga ?? null,
+            getChapter: data.actions?.getChapter ?? null
         }
     }
 }
@@ -159,7 +45,7 @@ function createPluginModules() {
 // --- Registry accessors ---
 
 function getPlugin(id) {
-    return pluginRegistry.get(id) || null
+    return pluginRegistry.get(id) ?? null
 }
 
 function getAllPlugins() {
@@ -248,9 +134,12 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
     }
 
     // Validate manifest schema
-    const { valid, errors } = validateManifest(manifest)
-    if (!valid) {
-        return { plugin: null, reason: `Invalid manifest: ${errors.join(', ')}` }
+    const manifestValidation = validateManifest(manifest)
+    if (!manifestValidation.valid) {
+        return {
+            plugin: null,
+            reason: `Invalid manifest: ${manifestValidation.errors.join(', ')}`
+        }
     }
 
     // Resolve main file (manifest.main takes priority, fallback to default list)
@@ -272,9 +161,14 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
         return { plugin: null, reason: `Failed to read main file: ${error.message}` }
     }
 
-    const scanResult = scanPluginSource(sourceCode, manifest.id)
-    if (!scanResult.safe) {
-        return { plugin: null, reason: `Security violations: ${scanResult.violations.join(', ')}` }
+    const sourceValidation = validatePluginSource(sourceCode)
+    if (!sourceValidation.valid) {
+        logger.warn(`[SOURCE] '${manifest.id}' blocked — security violations:`)
+        for (const v of sourceValidation.violations) logger.warn(`  - ${v}`)
+        return {
+            plugin: null,
+            reason: `Security violations: ${sourceValidation.violations.join(', ')}`
+        }
     }
 
     // Import the main file
@@ -284,15 +178,18 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
         // On Windows, convert the path to a file URL to handle spaces and other special chars correctly
         const importPath = process.platform === 'win32' ? `file://${mainFilePath}` : mainFilePath
         const raw = await import(importPath)
-        pluginExports = raw.default || raw
+        pluginExports = raw.default ?? raw
     } catch (error) {
         return { plugin: null, reason: `Failed to import main file: ${error.message}` }
     }
 
     // Validate exported API surface
-    const { valid: exportsValid, missing } = validatePluginExports(pluginExports)
-    if (!exportsValid) {
-        return { plugin: null, reason: `Missing required exports: ${missing.join(', ')}` }
+    const exportsValidation = validatePluginExports(pluginExports)
+    if (!exportsValidation.valid) {
+        return {
+            plugin: null,
+            reason: `Missing required exports: ${exportsValidation.missing.join(', ')}`
+        }
     }
 
     // Resolve icon file (manifest.icon takes priority, fallback to default list)
@@ -300,7 +197,7 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
         ? [manifest.icon, ...iconFileNames.filter((n) => n !== manifest.icon)]
         : iconFileNames
     const iconFileName =
-        iconCandidates.find((name) => pluginFiles.some((f) => f.isFile() && f.name === name)) ||
+        iconCandidates.find((name) => pluginFiles.some((f) => f.isFile() && f.name === name)) ??
         null
 
     // Assemble plugin object
@@ -315,7 +212,7 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
         logger.debug(`Loaded plugin [${manifest.id}] with files:`, {
             manifest: manifestFileName,
             main: mainFileName,
-            icon: iconFileName || 'none'
+            icon: iconFileName ?? 'none'
         })
     }
 
@@ -349,7 +246,7 @@ async function loadPlugins() {
             }
         } else {
             failures.push({ name: pluginDir.name, reason })
-            logger.warn(`[X] Failed to load [${pluginDir.name}]: ${reason}`)
+            logger.warn(`[X] Failed to load {${pluginDir.name}}: ${reason}`)
         }
     }
 

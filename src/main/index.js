@@ -3,7 +3,7 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
 import { initializeAppData, getAppDataPath, getFolderPath } from './appDataManager.js'
-import { initializePluginsFolder, loadPlugins } from './pluginManager.js'
+import { initializePluginsFolder, loadPlugins } from './pluginSystem/pluginManager.js'
 import { createModuleLogger } from './logger.js'
 
 const logger = createModuleLogger('Main')
