@@ -12,6 +12,8 @@ import {
 
 const logger = createModuleLogger('Plugins')
 
+const CURRENT_API_VERSION = 1
+
 const manifestFileNames = ['manifest.json', 'meta.json', 'metadata.json']
 const mainFileNames = ['index.js', 'main.js']
 const iconFileNames = ['icon.png']
@@ -140,6 +142,13 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
             plugin: null,
             reason: `Invalid manifest: ${manifestValidation.errors.join(', ')}`
         }
+    }
+
+    // Warn if plugin targets a different API version
+    if (manifest.apiVersion !== CURRENT_API_VERSION) {
+        logger.warn(
+            `[API] '${manifest.id}' targets apiVersion ${manifest.apiVersion}, current is ${CURRENT_API_VERSION} — plugin may be incompatible`
+        )
     }
 
     // Resolve main file (manifest.main takes priority, fallback to default list)
