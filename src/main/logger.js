@@ -1,6 +1,6 @@
 import winston from 'winston'
 import DailyRotateFile from 'winston-daily-rotate-file'
-import { getFolderPath } from './appDataManager'
+import { getFolderPath } from '@appData'
 import { join } from 'path'
 import { inspect } from 'util'
 

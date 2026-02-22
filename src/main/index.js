@@ -2,9 +2,9 @@ import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
-import { initializeAppData, getAppDataPath, getFolderPath } from './appDataManager.js'
-import { initializePluginsFolder, loadPlugins } from './pluginSystem/pluginManager.js'
-import { createModuleLogger } from './logger.js'
+import { initializeAppData, getAppDataPath, getFolderPath } from '@appData'
+import { initializePluginsFolder, loadPlugins } from '@pluginSystem'
+import { createModuleLogger } from '@logger'
 
 const logger = createModuleLogger('Main')
 
