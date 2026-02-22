@@ -1,5 +1,5 @@
-import { getFolderPath } from '../appDataManager'
-import { createModuleLogger } from '../logger'
+import { getFolderPath } from '@appData'
+import { createModuleLogger } from '@logger'
 import { join } from 'path'
 import { mkdir, stat, readdir, readFile } from 'fs/promises'
 import axios from 'axios'
@@ -8,7 +8,7 @@ import {
     validateManifest,
     validatePluginSource,
     validatePluginExports
-} from './pluginValidator'
+} from '@pluginSystem'
 
 const logger = createModuleLogger('Plugins')
 
