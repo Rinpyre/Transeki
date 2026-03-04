@@ -11,5 +11,10 @@
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": ".github/copilot-commit-instructions.md"
+    }
+  ]
 }
