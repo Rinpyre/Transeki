@@ -2,7 +2,7 @@
 
 ## Commit Message Rules (ALWAYS FOLLOW)
 
-For commit messages rules, please refer to the [Commit Message Guidelines](./copilot-commit-instructions.md) file. This file contains detailed instructions on how to format commit messages according to the conventional commit format, which is essential for maintaining a clear and consistent commit history.
+For commit messages rules, please refer to the [Commit Message Guidelines](./instructions/commit-message-instructions.md) file. This file contains detailed instructions on how to format commit messages according to the conventional commit format, which is essential for maintaining a clear and consistent commit history.
 
 ## Pull Request Standards
 
