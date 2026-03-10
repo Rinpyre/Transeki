@@ -23,6 +23,11 @@ if (process.contextIsolated) {
             getAppDataPath: () => ipcRenderer.invoke('get-appdata-path'),
             getFolderPath: (folderName) => ipcRenderer.invoke('get-folder-path', folderName)
         })
+        contextBridge.exposeInMainWorld('plugins', {
+            getPlugins: () => ipcRenderer.invoke('get-plugins'),
+            getPluginIds: () => ipcRenderer.invoke('get-plugin-ids'),
+            getPlugin: (id) => ipcRenderer.invoke('get-plugin', id)
+        })
         contextBridge.exposeInMainWorld('env', {
             isDev: process.env.NODE_ENV === 'development',
             isProd: process.env.NODE_ENV === 'production',

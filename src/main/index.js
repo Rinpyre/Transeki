@@ -3,7 +3,13 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
 import { initializeAppData, getAppDataPath, getFolderPath } from '@appData'
-import { initializePluginsFolder, loadPlugins } from '@pluginSystem'
+import {
+    initializePluginsFolder,
+    loadPlugins,
+    getPlugin,
+    getAllPlugins,
+    getPluginIds
+} from '@pluginSystem'
 import { createModuleLogger } from '@logger'
 
 const logger = createModuleLogger('Main')
@@ -15,6 +21,11 @@ function registerIpcHandlers() {
     // AppData IPC handlers
     ipcMain.handle('get-appdata-path', () => getAppDataPath())
     ipcMain.handle('get-folder-path', (_, folderName) => getFolderPath(folderName))
+
+    // Plugin system IPC handlers
+    ipcMain.handle('get-plugins', () => getAllPlugins())
+    ipcMain.handle('get-plugin-ids', () => getPluginIds())
+    ipcMain.handle('get-plugin', (_, id) => getPlugin(id))
 }
 
 function createWindow() {
