@@ -1,15 +1,12 @@
 import { contextBridge, ipcRenderer } from 'electron'
 
-// Custom APIs for renderer
-const api = {}
-
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
 if (process.contextIsolated) {
     try {
         contextBridge.exposeInMainWorld('electron', {
-            ipcRenderer: {
+            ipc: {
                 send: (channel, ...args) => ipcRenderer.send(channel, ...args),
                 on: (channel, func) => {
                     const subscription = (_event, ...args) => func(...args)
@@ -20,42 +17,21 @@ if (process.contextIsolated) {
                     ipcRenderer.once(channel, (_event, ...args) => func(...args))
                 },
                 invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args)
-            },
-            appData: {
-                getAppDataPath: () => ipcRenderer.invoke('get-appdata-path'),
-                getFolderPath: (folderName) => ipcRenderer.invoke('get-folder-path', folderName)
-            },
-            process: {
-                // Manually expose only safe version strings, not the whole process object
-                versions: process.versions
             }
         })
-        contextBridge.exposeInMainWorld('api', api)
+        contextBridge.exposeInMainWorld('appData', {
+            getAppDataPath: () => ipcRenderer.invoke('get-appdata-path'),
+            getFolderPath: (folderName) => ipcRenderer.invoke('get-folder-path', folderName)
+        })
+        contextBridge.exposeInMainWorld('env', {
+            isDev: process.env.NODE_ENV === 'development',
+            isProd: process.env.NODE_ENV === 'production',
+            platform: process.platform,
+            versions: process.versions
+        })
     } catch (error) {
         console.error(error)
     }
-} else {
-    // Fallback for non-isolated contexts (not recommended but good for debugging)
-    window.electron = {
-        ipcRenderer: {
-            send: (channel, ...args) => ipcRenderer.send(channel, ...args),
-            on: (channel, func) => {
-                const subscription = (_event, ...args) => func(...args)
-                ipcRenderer.on(channel, subscription)
-                return () => ipcRenderer.removeListener(channel, subscription)
-            },
-            once: (channel, func) => {
-                ipcRenderer.once(channel, (_event, ...args) => func(...args))
-            },
-            invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args)
-        },
-        appData: {
-            getAppDataPath: () => ipcRenderer.invoke('get-appdata-path'),
-            getFolderPath: (folderName) => ipcRenderer.invoke('get-folder-path', folderName)
-        },
-        process: {
-            versions: process.versions
-        }
-    }
-    window.api = api
 }
+
+// Fallback for non-isolated contexts is not recommended and will NOT be used despite being helpful for debugging, so we won't implement it. If context isolation is disabled, the preload script will simply do nothing and the renderer will have no access to Electron APIs, which is safer than exposing them unsafely.
