@@ -8,8 +8,16 @@ import { createModuleLogger } from '@logger'
 
 const logger = createModuleLogger('Main')
 
+function registerIpcHandlers() {
+    // IPC test
+    ipcMain.on('ping', () => console.log('pong'))
+
+    // AppData IPC handlers
+    ipcMain.handle('get-appdata-path', () => getAppDataPath())
+    ipcMain.handle('get-folder-path', (_, folderName) => getFolderPath(folderName))
+}
+
 function createWindow() {
-    // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: 1684, // +16px
         height: 851, // +39px
@@ -28,6 +36,7 @@ function createWindow() {
         mainWindow.show()
     })
 
+    // Open external links in default browser
     mainWindow.webContents.setWindowOpenHandler((details) => {
         shell.openExternal(details.url)
         return { action: 'deny' }
@@ -47,6 +56,7 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
     // Set app user model id for windows
+    // This is required for notifications and some other features to work correctly on Windows
     electronApp.setAppUserModelId('com.rinpyre.transeki')
 
     // Completely disable the application menu
@@ -57,7 +67,7 @@ app.whenReady().then(async () => {
         console.error('Failed to initialize appdata:', error)
     })
 
-    // Now logger can safely write to files
+    // Log app startup, which will also initialize the logger and create the log file for this sessiI
     logger.info('Application started successfully')
     logger.info('AppData initialization complete')
 
@@ -82,13 +92,8 @@ app.whenReady().then(async () => {
         optimizer.watchWindowShortcuts(window)
     })
 
-    // IPC test
-    ipcMain.on('ping', () => console.log('pong'))
-
-    // AppData IPC handlers
-    ipcMain.handle('get-appdata-path', () => getAppDataPath())
-    ipcMain.handle('get-folder-path', (_, folderName) => getFolderPath(folderName))
-
+    // Call other setup functions
+    registerIpcHandlers()
     createWindow()
 
     app.on('activate', function () {
@@ -106,6 +111,3 @@ app.on('window-all-closed', () => {
         app.quit()
     }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
