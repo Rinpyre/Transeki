@@ -14,7 +14,8 @@ const BLOCKED_PATTERNS = [
         message: 'use of new Function() is not allowed'
     },
     {
-        pattern: /(?:require|import)\s*\(\s*['"]fs['"]\s*\)|from\s+['"]fs['"]|import\s+['"]fs['"]/,
+        pattern:
+            /(?:require|import)\s*\(\s*['"]fs['"]\s*\)|(?:require|import)\s*\(\s*(['"`])f\1\s*\+\s*\1s\1\s*\)|from\s+['"]fs['"]|import\s+['"]fs['"]/,
         message: "direct filesystem access via 'fs' module is not allowed"
     },
     {
