@@ -59,7 +59,7 @@ app.whenReady().then(async () => {
         console.error('Failed to initialize appdata:', error)
     })
 
-    // Log app startup, which will also initialize the logger and create the log file for this sessiI
+    // Log app startup, which will also initialize the logger and create the log file for this session
     logger.info('Application started successfully')
     logger.info('AppData initialization complete')
 
