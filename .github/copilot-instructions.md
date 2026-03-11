@@ -69,10 +69,10 @@ Do NOT include:
 
 ### Reviewer & Assignment
 
-- Assign to `FireBoy00` for notification
+- Assign to `Rinpyre` for notification
 - Request review from team member(s)
 - Note: Author approval does not count toward merge requirements
-  > **Important:** As of now, this is a solo project, so, all PRs will be assigned to `FireBoy00` and reviewed by `FireBoy00`. In the future, when more contributors join, we will update this guideline to reflect the new review process.
+  > **Important:** As of now, this is a solo project, so, all PRs will be assigned to `Rinpyre` and reviewed by `Rinpyre`. In the future, when more contributors join, we will update this guideline to reflect the new review process.
 
 ### PR Size & Scope
 
