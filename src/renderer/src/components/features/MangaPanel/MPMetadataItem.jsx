@@ -1,4 +1,4 @@
-const MPMetadataItem = ({ type, value }) => {
+export const MPMetadataItem = ({ type, value }) => {
     return (
         <p className="metadata-item">
             <span className="type text-gray-400">{type}: </span>
@@ -6,5 +6,3 @@ const MPMetadataItem = ({ type, value }) => {
         </p>
     )
 }
-
-export default MPMetadataItem

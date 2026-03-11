@@ -1,3 +1,3 @@
-export { default as Sidebar } from './Sidebar'
-export { default as SidebarLink } from './SidebarLink'
-export { default as MangaContainer } from './MangaContainer'
+export * from './Sidebar'
+export * from './SidebarLink'
+export * from './MangaContainer'

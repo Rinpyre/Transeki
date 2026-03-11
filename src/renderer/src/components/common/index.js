@@ -1,4 +1,4 @@
-export { default as MangaCard } from './MangaCard'
-export { default as SearchBar } from './SearchBar'
-export { default as RippleLoading } from './rippleLoading'
-export { mangaSchema, demoDatumManga } from './manga.schema'
+export * from './MangaCard'
+export * from './SearchBar'
+export * from './RippleLoading'
+export * from './manga.schema'

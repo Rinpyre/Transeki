@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react'
 
-const MangaContainer = ({ children }) => {
+export const MangaContainer = ({ children }) => {
     const glowRef = useRef(null)
     const glowDimensionsRef = useRef({ width: 0, height: 0 })
 
@@ -64,5 +64,3 @@ const MangaContainer = ({ children }) => {
         </div>
     )
 }
-
-export default MangaContainer

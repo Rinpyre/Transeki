@@ -16,7 +16,7 @@ import {
     RippleLoading
 } from '@components'
 
-const MangaPanel = ({ manga, onClose, open = false, loading = false, className = '' }) => {
+export const MangaPanel = ({ manga, onClose, open = false, loading = false, className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
     const [contentHeight, setContentHeight] = useState(0)
     const contentRef = useRef(null)
@@ -177,5 +177,3 @@ const MangaPanel = ({ manga, onClose, open = false, loading = false, className =
         </div>
     )
 }
-
-export default MangaPanel

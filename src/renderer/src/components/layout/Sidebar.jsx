@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { SidebarLink } from '@components'
 
-const Sidebar = () => {
+export const Sidebar = () => {
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -61,5 +61,3 @@ const Sidebar = () => {
         </nav>
     )
 }
-
-export default Sidebar

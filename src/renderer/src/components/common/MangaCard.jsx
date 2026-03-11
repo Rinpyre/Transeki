@@ -1,4 +1,4 @@
-const MangaCard = ({ manga, onClick }) => {
+export const MangaCard = ({ manga, onClick }) => {
     return (
         <div
             className="manga-card group flex w-full flex-col rounded-lg transition-all duration-300 will-change-transform hover:-translate-y-1"
@@ -30,5 +30,3 @@ const MangaCard = ({ manga, onClick }) => {
         </div>
     )
 }
-
-export default MangaCard

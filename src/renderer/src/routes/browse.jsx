@@ -5,7 +5,7 @@ import { MangaPanel } from '@components'
 import { sleep } from '@utils'
 import { demoDatumManga } from '@components'
 
-const BrowsePage = () => {
+export const BrowsePage = () => {
     const [mangaList, setMangaList] = useState([])
     const [selectedManga, setSelectedManga] = useState(demoDatumManga)
     const [isPanelOpen, setIsPanelOpen] = useState(true)
@@ -68,5 +68,3 @@ const BrowsePage = () => {
         </div>
     )
 }
-
-export default BrowsePage

@@ -1,4 +1,4 @@
-const SidebarLink = ({ icon: Icon, isActive, onClick, label, id, className = '' }) => {
+export const SidebarLink = ({ icon: Icon, isActive, onClick, label, id, className = '' }) => {
     return (
         <li
             id={id}
@@ -13,5 +13,3 @@ const SidebarLink = ({ icon: Icon, isActive, onClick, label, id, className = '' 
         </li>
     )
 }
-
-export default SidebarLink

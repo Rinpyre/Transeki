@@ -1,4 +1,4 @@
-const RippleLoading = () => {
+export const RippleLoading = () => {
     return (
         <div className="loading-screen bg-secondary/70 absolute z-1 flex h-full w-full items-center justify-center rounded-xl">
             <div className="border-accent-dark bg-accent-dark absolute h-5 w-5 animate-ping rounded-full border-4"></div>
@@ -7,5 +7,3 @@ const RippleLoading = () => {
         </div>
     )
 }
-
-export default RippleLoading

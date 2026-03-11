@@ -1,4 +1,4 @@
-const MPGenreBadge = ({ name, id }) => {
+export const MPGenreBadge = ({ name, id }) => {
     return (
         <span
             id={id}
@@ -8,5 +8,3 @@ const MPGenreBadge = ({ name, id }) => {
         </span>
     )
 }
-
-export default MPGenreBadge

@@ -1,6 +1,6 @@
 import { BookCheck as Read } from 'lucide-react'
 
-const MangaChapterItem = ({ name, date, read = false }) => {
+export const MPChapterItem = ({ name, date, read = false }) => {
     return (
         <div
             className={`chapter-item hover:bg-primary/50 border-b-tertiary ${read ? 'opacity-60' : ''} flex cursor-pointer items-center justify-between border-b px-1 py-3 transition-colors`}
@@ -23,5 +23,3 @@ const MangaChapterItem = ({ name, date, read = false }) => {
         </div>
     )
 }
-
-export default MangaChapterItem

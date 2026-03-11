@@ -1,4 +1,4 @@
-const MPActionBtn = ({
+export const MPActionBtn = ({
     name,
     icon: Icon,
     iconOnly = false,
@@ -20,5 +20,3 @@ const MPActionBtn = ({
         </button>
     )
 }
-
-export default MPActionBtn

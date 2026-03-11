@@ -18,14 +18,18 @@ components/
 ├── common/               # Reusable UI components
 │   ├── index.js
 │   ├── MangaCard.jsx
-│   ├── MangaChapterItem.jsx
-│   └── SearchBar.jsx
+│   ├── SearchBar.jsx
+│   ├── RippleLoading.jsx
+│   └── manga.schema.js
 └── features/             # Feature-specific components
     ├── index.js
     └── MangaPanel/
         ├── index.js
         ├── MangaPanel.jsx
-        └── [future components]
+        ├── MPChapterItem.jsx
+        ├── MPActionBtn.jsx
+        ├── MPGenreBadge.jsx
+        └── MPMetadataItem.jsx
 ```
 
 ## Category Guidelines
@@ -63,7 +67,7 @@ components/
 import { MangaCard, SearchBar, Sidebar } from '@components'
 
 // Good - All components come from barrel
-import { MangaPanel, MangaChapterItem } from '@components'
+import { MangaPanel, MPChapterItem } from '@components'
 ```
 
 ### ❌ Avoid Direct Paths
@@ -81,35 +85,60 @@ Within feature folders, use relative imports for **utilities and hooks only**:
 ```jsx
 // Inside features/MangaPanel/MangaPanel.jsx
 import { useChapterNavigation } from './hooks/useChapterNavigation' // Local utility
-import { MangaChapterItem } from '@components' // Via barrel
+import { MPChapterItem } from '@components' // Via barrel
 ```
 
 ## Barrel Export Pattern
 
-Each folder has an `index.js` that re-exports its components:
+Each folder has an `index.js` that re-exports from its components using `export *`:
 
 ```javascript
 // layout/index.js
-export { default as Sidebar } from './Sidebar'
-export { default as SidebarLink } from './SidebarLink'
-export { default as MangaContainer } from './MangaContainer'
+export * from './Sidebar'
+export * from './SidebarLink'
+export * from './MangaContainer'
 
 // common/index.js
-export { default as MangaCard } from './MangaCard'
-export { default as MangaChapterItem } from './MangaChapterItem'
-export { default as SearchBar } from './SearchBar'
+export * from './MangaCard'
+export * from './SearchBar'
+export * from './RippleLoading'
+export * from './manga.schema'
 
 // features/index.js
 export * from './MangaPanel'
 
 // features/MangaPanel/index.js
-export { default as MangaPanel } from './MangaPanel'
+export * from './MangaPanel'
+export * from './MPChapterItem'
+export * from './MPActionBtn'
+export * from './MPGenreBadge'
+export * from './MPMetadataItem'
 
 // Root: components/index.js (re-export everything)
 export * from './layout'
 export * from './common'
 export * from './features'
 ```
+
+**Component definitions use inline named exports:**
+
+```javascript
+// Sidebar.jsx
+export const Sidebar = () => {
+  // component logic
+}
+
+// MangaCard.jsx
+export const MangaCard = ({ manga, onClick }) => {
+  // component logic
+}
+```
+
+This pattern ensures:
+
+- **Single source of truth** - components define their own exports, no manual listing needed
+- **Scalability** - add new components without updating index.js
+- **Maintainability** - less boilerplate, easier to refactor
 
 ## Benefits
 

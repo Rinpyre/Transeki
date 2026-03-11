@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
 
-const SearchBar = ({ onSearch, className = '' }) => {
+export const SearchBar = ({ onSearch, className = '' }) => {
     const [searchInput, setSearchInput] = useState('')
     const [underlineFocused, setUnderlineFocused] = useState(false)
 
@@ -43,5 +43,3 @@ const SearchBar = ({ onSearch, className = '' }) => {
         </form>
     )
 }
-
-export default SearchBar
