@@ -3,7 +3,16 @@ import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-    main: {},
+    main: {
+        resolve: {
+            alias: {
+                '@': resolve('src/main'),
+                '@logger': resolve('src/main/logger.js'),
+                '@appData': resolve('src/main/appDataManager.js'),
+                '@pluginSystem': resolve('src/main/pluginSystem')
+            }
+        }
+    },
     preload: {
         // FORCE CommonJS output to prevent "Cannot use import statement" error
         build: {

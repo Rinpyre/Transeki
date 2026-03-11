@@ -2,55 +2,7 @@
 
 ## Commit Message Rules (ALWAYS FOLLOW)
 
-1. Read the code changes carefully
-2. Determine the TYPE of change
-3. Identify the SCOPE if applicable
-4. Write clear, concise description
-
-### Format
-
-`<type>(<scope>): <subject>`
-
-### Types (Must Use)
-
-- `feat:` - New feature
-- `fix:` - Bug fix
-- `perf:` - Performance optimization
-- `refactor:` - Code restructure
-- `style:` - Formatting/styling
-- `chore:` - Maintenance/config
-- `docs:` - Documentation
-- `test:` - Tests
-
-### Scope (Optional but Recommended)
-
-Use component/area name in parentheses. Examples:
-
-- `feat(MangaPanel):` - MangaPanel component
-- `fix(SearchBar):` - SearchBar component
-- `perf(MangaContainer):` - MangaContainer
-- `chore(package.json):` - Dependencies
-
-### Subject Line Guidelines
-
-- ✅ Brief summary of changes
-- ✅ The changes should be presented as featured focused (human said) not component / code focused
-- ✅ Use imperative mood
-- ✅ No period at end
-- ✅ Max 50 chars
-- ✅ If multiple or complex changes, combine all in one summary and detail in body / description
-- ❌ No duplication of scope name in the summery if already in scope
-
-### Description / Body Rules
-
-- ✅ Explain the "why" and "what", not the "how"
-- ✅ Imperative mood: "add" not "added"
-- ✅ No period at end
-- ✅ Keep to one line if possible
-- ✅ Use bullet points for multiple changes
-- ✅ Reference issues/PRs if relevant
-- ❌ No code snippets
-- ❌ No vague messages like "Update stuff"
+For commit messages rules, please refer to the [Commit Message Guidelines](./instructions/commit-message-instructions.md) file. This file contains detailed instructions on how to format commit messages according to the conventional commit format, which is essential for maintaining a clear and consistent commit history.
 
 ## Pull Request Standards
 
@@ -117,10 +69,10 @@ Do NOT include:
 
 ### Reviewer & Assignment
 
-- Assign to `FireBoy00` for notification
+- Assign to `Rinpyre` for notification
 - Request review from team member(s)
 - Note: Author approval does not count toward merge requirements
-  > **Important:** As of now, this is a solo project, so, all PRs will be assigned to `FireBoy00` and reviewed by `FireBoy00`. In the future, when more contributors join, we will update this guideline to reflect the new review process.
+  > **Important:** As of now, this is a solo project, so, all PRs will be assigned to `Rinpyre` and reviewed by `Rinpyre`. In the future, when more contributors join, we will update this guideline to reflect the new review process.
 
 ### PR Size & Scope
 

@@ -1,11 +1,15 @@
-import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
+import { app, shell, BrowserWindow, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
-import { initializeAppData, getAppDataPath, getFolderPath } from './appDataManager.js'
+import { initializeAppData } from '@appData'
+import { initializePluginsFolder, loadPlugins } from '@pluginSystem'
+import { createModuleLogger } from '@logger'
+import { registerIpcHandlers } from './ipcHandlers.js'
+
+const logger = createModuleLogger('Main')
 
 function createWindow() {
-    // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: 1684, // +16px
         height: 851, // +39px
@@ -24,6 +28,7 @@ function createWindow() {
         mainWindow.show()
     })
 
+    // Open external links in default browser
     mainWindow.webContents.setWindowOpenHandler((details) => {
         shell.openExternal(details.url)
         return { action: 'deny' }
@@ -41,17 +46,41 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     // Set app user model id for windows
+    // This is required for notifications and some other features to work correctly on Windows
     electronApp.setAppUserModelId('com.rinpyre.transeki')
 
     // Completely disable the application menu
     Menu.setApplicationMenu(null)
 
     // Initialize appdata directory structure
-    initializeAppData().catch((error) => {
+    await initializeAppData().catch((error) => {
         console.error('Failed to initialize appdata:', error)
     })
+
+    // Log app startup, which will also initialize the logger and create the log file for this session
+    logger.info('Application started successfully')
+    logger.info('AppData initialization complete')
+
+    // Load plugins
+    // We await this because we want the app to have the plugins ready to use.
+    await initializePluginsFolder()
+        .then(() => loadPlugins())
+        .then((plugins) => {
+            logger.info(
+                `Successfully loaded ${plugins.length} plugin${plugins.length !== 1 ? 's' : ''}!`
+            )
+            if (plugins.length > 0 && process.env.NODE_ENV === 'development') {
+                logger.debug(
+                    'Loaded plugins:',
+                    plugins.map((p) => p.info.name)
+                )
+            }
+        })
+        .catch((error) => {
+            logger.error('Failed to load plugins:', error)
+        })
 
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.
@@ -60,13 +89,8 @@ app.whenReady().then(() => {
         optimizer.watchWindowShortcuts(window)
     })
 
-    // IPC test
-    ipcMain.on('ping', () => console.log('pong'))
-
-    // AppData IPC handlers
-    ipcMain.handle('get-appdata-path', () => getAppDataPath())
-    ipcMain.handle('get-folder-path', (_, folderName) => getFolderPath(folderName))
-
+    // Call other setup functions
+    registerIpcHandlers()
     createWindow()
 
     app.on('activate', function () {
@@ -84,6 +108,3 @@ app.on('window-all-closed', () => {
         app.quit()
     }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
