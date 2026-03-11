@@ -37,11 +37,14 @@ function createPlugin(data) {
 // --- Module injection ---
 
 // Plugin calling convention:
-//   plugin.actions.search(query, modules)
-//   plugin.actions.getManga(id, modules)
-//   plugin.actions.getChapter(id, chapterNum, modules)
-function createPluginModules() {
-    return { axios }
+//   plugin.actions.search(query, modules)                    → modules: { axios, signal }
+//   plugin.actions.getManga(id, modules)                     → modules: { axios, signal }
+//   plugin.actions.getChapter(id, chapterNum, modules)       → modules: { axios, signal }
+//
+// `signal` is an AbortSignal — pass it to axios: axios.get(url, { signal })
+// This enables true cancellation when a timeout fires or the user navigates away.
+function createPluginModules(signal = null) {
+    return { axios, signal }
 }
 
 // --- Registry accessors ---

@@ -1,32 +1,13 @@
-import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
+import { app, shell, BrowserWindow, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
-import { initializeAppData, getAppDataPath, getFolderPath } from '@appData'
-import {
-    initializePluginsFolder,
-    loadPlugins,
-    getPlugin,
-    getAllPlugins,
-    getPluginIds
-} from '@pluginSystem'
+import { initializeAppData } from '@appData'
+import { initializePluginsFolder, loadPlugins } from '@pluginSystem'
 import { createModuleLogger } from '@logger'
+import { registerIpcHandlers } from './ipcHandlers.js'
 
 const logger = createModuleLogger('Main')
-
-function registerIpcHandlers() {
-    // IPC test
-    ipcMain.on('ping', () => console.log('pong'))
-
-    // AppData IPC handlers
-    ipcMain.handle('get-appdata-path', () => getAppDataPath())
-    ipcMain.handle('get-folder-path', (_, folderName) => getFolderPath(folderName))
-
-    // Plugin system IPC handlers
-    ipcMain.handle('get-plugins', () => getAllPlugins())
-    ipcMain.handle('get-plugin-ids', () => getPluginIds())
-    ipcMain.handle('get-plugin', (_, id) => getPlugin(id))
-}
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -83,13 +64,18 @@ app.whenReady().then(async () => {
     logger.info('AppData initialization complete')
 
     // Load plugins
-    // We don't await this because we want the app to load as fast as possible and plugins can be loaded in the background
-    initializePluginsFolder()
+    // We await this because we want the app to have the plugins ready to use.
+    await initializePluginsFolder()
         .then(() => loadPlugins())
         .then((plugins) => {
-            logger.info(`Successfully loaded ${plugins.length} plugins!`)
+            logger.info(
+                `Successfully loaded ${plugins.length} plugin${plugins.length !== 1 ? 's' : ''}!`
+            )
             if (plugins.length > 0 && process.env.NODE_ENV === 'development') {
-                logger.debug('Loaded plugins:', { plugins: plugins.map((p) => p.info.name) })
+                logger.debug(
+                    'Loaded plugins:',
+                    plugins.map((p) => p.info.name)
+                )
             }
         })
         .catch((error) => {

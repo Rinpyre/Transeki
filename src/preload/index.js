@@ -24,9 +24,13 @@ if (process.contextIsolated) {
             getFolderPath: (folderName) => ipcRenderer.invoke('get-folder-path', folderName)
         })
         contextBridge.exposeInMainWorld('plugins', {
-            getPlugins: () => ipcRenderer.invoke('get-plugins'),
-            getPluginIds: () => ipcRenderer.invoke('get-plugin-ids'),
-            getPlugin: (id) => ipcRenderer.invoke('get-plugin', id)
+            getPlugins: () => ipcRenderer.invoke('plugins:get-all'),
+            getPlugin: (id) => ipcRenderer.invoke('plugins:get-by-id', id),
+            search: (pluginId, query) => ipcRenderer.invoke('plugin:search', pluginId, query),
+            getManga: (pluginId, mangaId) =>
+                ipcRenderer.invoke('plugin:get-manga', pluginId, mangaId),
+            getChapter: (pluginId, mangaId, chapterNum) =>
+                ipcRenderer.invoke('plugin:get-chapter', pluginId, mangaId, chapterNum)
         })
         contextBridge.exposeInMainWorld('env', {
             isDev: process.env.NODE_ENV === 'development',
