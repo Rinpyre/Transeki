@@ -3,7 +3,7 @@ import axios from 'axios'
 // TODO: Remove debug console.log() after proper implementation
 
 const baseUrl = 'https://api.mangadex.org'
-const noCoverUrl = 'https://via.placeholder.com/128x192?text=No+Cover'
+const noCoverUrl = 'https://placehold.co/128x192?text=No+Cover'
 
 const getTitleForManga = (titles, altTitles = []) => {
     // Prefer default en title
