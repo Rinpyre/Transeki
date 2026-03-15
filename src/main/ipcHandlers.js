@@ -1,6 +1,9 @@
 import { ipcMain } from 'electron'
 import { getAppDataPath, getFolderPath } from '@appData'
 import { getAllPlugins, getPlugin, createPluginModules } from '@pluginSystem'
+import { createModuleLogger } from '@logger'
+
+const logger = createModuleLogger('IPC Handlers')
 
 const PLUGIN_TIMEOUT_MS = 10_000
 
@@ -51,7 +54,7 @@ async function runPluginAction(pluginId, actionFn) {
 
 export function registerIpcHandlers() {
     // IPC test
-    ipcMain.on('ping', () => console.log('pong'))
+    ipcMain.on('ping', () => logger.info('!Pong! Received ping from renderer!'))
 
     // AppData IPC handlers
     ipcMain.handle('get-appdata-path', () => getAppDataPath())
