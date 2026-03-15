@@ -9,6 +9,7 @@ import {
     validatePluginSource,
     validatePluginExports
 } from '@pluginSystem'
+import { pathToFileURL } from 'url'
 
 const logger = createModuleLogger('Plugins')
 
@@ -187,8 +188,8 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
     let pluginExports
     try {
         const mainFilePath = join(pluginPath, mainFileName)
-        // On Windows, convert the path to a file URL to handle spaces and other special chars correctly
-        const importPath = process.platform === 'win32' ? `file://${mainFilePath}` : mainFilePath
+        // Convert to file URL for dynamic import (required on Windows)
+        const importPath = pathToFileURL(mainFilePath).href
         const raw = await import(importPath)
         pluginExports = raw.default ?? raw
     } catch (error) {
@@ -213,7 +214,7 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
         null
 
     // Assemble plugin object
-    const iconPath = iconFileName ? `file://${join(pluginPath, iconFileName)}` : null
+    const iconPath = iconFileName ? pathToFileURL(join(pluginPath, iconFileName)).href : null
     const plugin = createPlugin({
         info: manifest,
         icon: iconPath,
