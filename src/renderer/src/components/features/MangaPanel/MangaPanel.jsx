@@ -64,7 +64,7 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                         }}
                     ></div>
                     <div className="flex px-4 pt-4 pb-2">
-                        <div className="cover w-2/5 overflow-hidden rounded-md shadow-md">
+                        <div className="cover min-h-50 min-w-35 overflow-hidden rounded-md shadow-md">
                             <img
                                 src={manga.cover || noCover}
                                 alt={manga.title ? `${manga.title} Cover` : 'Manga Cover'}
