@@ -50,6 +50,7 @@ NOTE: Do NOT use file names as scope. Use the name of the feature/component/area
 ### Subject Line Guidelines
 
 - ✅ Brief summary of changes
+- ✅ Start with uppercase first letter
 - ✅ The changes should be presented as featured focused (human said) not component / code focused
 - ✅ Use imperative mood
 - ✅ No period at end
