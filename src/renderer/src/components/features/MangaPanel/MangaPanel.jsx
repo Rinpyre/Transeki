@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useLayoutEffect } from 'react'
 import {
     Heart as Favorite,
     RefreshCcw as Tracking,
@@ -21,17 +21,27 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
     const [contentHeight, setContentHeight] = useState(0)
     const contentRef = useRef(null)
+    const prevMangaRef = useRef(null)
+    const maxDescriptionHeight = 116 // ~6 lines of text
 
     const scrollableStyle = {
         scrollbarWidth: 'none',
         msOverflowStyle: 'none'
     }
 
-    useEffect(() => {
-        if (contentRef.current) {
-            setContentHeight(contentRef.current.scrollHeight)
+    useLayoutEffect(() => {
+        // Only run when a NEW manga is loaded
+        if (contentRef.current && manga && manga !== prevMangaRef.current) {
+            const newHeight = contentRef.current.scrollHeight
+            setContentHeight(newHeight)
+
+            // Auto-expand only once, on first load of this manga
+            const shouldExpand = newHeight - maxDescriptionHeight < 100
+            setIsDescriptionExpanded(shouldExpand)
+
+            prevMangaRef.current = manga
         }
-    }, [isDescriptionExpanded])
+    }, [manga, maxDescriptionHeight])
 
     return (
         <div
@@ -105,7 +115,11 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                 <div
                     className="additional-info text-snow relative flex flex-col gap-2 overflow-hidden px-4 transition-all duration-300"
                     ref={contentRef}
-                    style={{ maxHeight: isDescriptionExpanded ? `${contentHeight}px` : '116px' }}
+                    style={{
+                        maxHeight: isDescriptionExpanded
+                            ? `${contentHeight}px`
+                            : `${maxDescriptionHeight}px`
+                    }}
                     role="button"
                     tabIndex={0}
                     aria-expanded={isDescriptionExpanded}
@@ -125,7 +139,7 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                             {manga.description || 'No description available.'}
                         </p>
                     </div>
-                    {contentHeight > 120 && (
+                    {contentHeight > maxDescriptionHeight && (
                         <button className="show-more absolute right-3 bottom-1 flex h-5 cursor-pointer px-1.5">
                             <span className="show-more-shadow from-secondary h-full w-10 bg-linear-to-l to-transparent"></span>
                             {isDescriptionExpanded ? (
@@ -148,7 +162,7 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                         </button>
                     )}
                     <div className="details-genres flex flex-wrap pb-7">
-                        {manga.genres.map((genre) => {
+                        {manga.genres?.map((genre) => {
                             const id = genre.toLowerCase().replace(/\s+/g, '-')
                             return <MPGenreBadge key={id} id={id} name={genre} />
                         })}
