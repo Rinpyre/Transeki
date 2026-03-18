@@ -29,7 +29,7 @@
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.1.0",
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
-    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/vite": "^4.2.2",
     "@vitejs/plugin-react": "^5.1.1",
     "electron": "^39.2.6",
     "electron-builder": "^26.0.12",
