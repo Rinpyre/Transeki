@@ -15,6 +15,7 @@ import {
     MPMetadataItem,
     RippleLoading
 } from '@components'
+import noCover from '@assets/no_cover.svg'
 
 export const MangaPanel = ({ manga, onClose, open = false, loading = false, className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
@@ -59,26 +60,26 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                         id="backdrop"
                         className="absolute -z-1 h-full w-full bg-cover bg-center bg-no-repeat opacity-10 blur-xs"
                         style={{
-                            backgroundImage: `url(${manga.cover})`
+                            backgroundImage: `url(${manga.cover || ''})`
                         }}
                     ></div>
                     <div className="flex px-4 pt-4 pb-2">
                         <div className="cover w-2/5 overflow-hidden rounded-md shadow-md">
                             <img
-                                src={manga.cover}
-                                alt={manga.title}
+                                src={manga.cover || noCover}
+                                alt={manga.title ? `${manga.title} Cover` : 'Manga Cover'}
                                 className="h-full w-full object-cover transition-transform duration-300 will-change-transform hover:scale-105 hover:cursor-pointer"
                             />
                         </div>
                         <div className="flex w-full flex-col pl-4">
                             <h2 className="title line-clamp-3 text-2xl font-semibold text-ellipsis">
-                                {manga.title}
+                                {manga.title || 'Unknown Title'}
                             </h2>
                             <div className="spacer grow"></div>
                             <div className="metadata">
-                                <MPMetadataItem type="Status" value={manga.status} />
-                                <MPMetadataItem type="Author" value={manga.author} />
-                                <MPMetadataItem type="Source" value={manga.source} />
+                                <MPMetadataItem type="Status" value={manga.status || 'Unknown'} />
+                                <MPMetadataItem type="Author" value={manga.author || 'Unknown'} />
+                                <MPMetadataItem type="Source" value={manga.source || 'Unknown'} />
                             </div>
                         </div>
                     </div>
@@ -118,9 +119,11 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                 >
                     <div className="description flex flex-col pb-2.5">
                         <h3 className="description-title text-metadata cursor-default text-lg font-semibold underline underline-offset-3">
-                            {manga.type} Description:
+                            {manga.type ? `${manga.type} Description` : 'Description'}
                         </h3>
-                        <p className="description-text mt-1 text-sm">{manga.description}</p>
+                        <p className="description-text mt-1 text-sm">
+                            {manga.description || 'No description available.'}
+                        </p>
                     </div>
                     {contentHeight > 120 && (
                         <button className="show-more absolute right-3 bottom-1 flex h-5 cursor-pointer px-1.5">
