@@ -16,6 +16,7 @@ import {
     RippleLoading
 } from '@components'
 import noCover from '@assets/no_cover.svg'
+import { getProxyUrl } from '@utils'
 
 export const MangaPanel = ({ manga, onClose, open = false, loading = false, className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
@@ -23,11 +24,7 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
     const contentRef = useRef(null)
     const prevMangaRef = useRef(null)
     const maxDescriptionHeight = 116 // ~6 lines of text
-
-    const scrollableStyle = {
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none'
-    }
+    const coverUrl = getProxyUrl('proxy', manga.cover, manga.sourceId)
 
     useLayoutEffect(() => {
         // Only run when a NEW manga is loaded
@@ -47,7 +44,7 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
         <div
             className={
                 `manga-panel bg-secondary fixed top-1/2 ${open ? 'right-6' : '-right-150'} z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 overflow-visible rounded-xl pb-4 shadow-xl transition-all duration-300 ease-in-out` +
-                ` ${className}`
+                (className ? ` ${className}` : '')
             }
         >
             <button
@@ -62,21 +59,20 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
             </button>
             {loading && <RippleLoading />}
             <div
-                className={`manga-panel-content overflow-hidden rounded-xl ${!loading && 'overflow-y-scroll'} h-full w-full`}
-                style={scrollableStyle}
+                className={`manga-panel-content overflow-hidden rounded-xl ${!loading && 'overflow-y-scroll'} scroll-none h-full w-full`}
             >
                 <div className="info text-snow relative w-full">
                     <div
                         id="backdrop"
                         className="absolute -z-1 h-full w-full bg-cover bg-center bg-no-repeat opacity-10 blur-xs"
                         style={{
-                            backgroundImage: `url(${manga.cover || ''})`
+                            backgroundImage: `url(${coverUrl || ''})`
                         }}
                     ></div>
                     <div className="flex px-4 pt-4 pb-2">
                         <div className="cover min-h-50 min-w-35 overflow-hidden rounded-md shadow-md">
                             <img
-                                src={manga.cover || noCover}
+                                src={coverUrl || noCover}
                                 alt={manga.title ? `${manga.title} Cover` : 'Manga Cover'}
                                 className="h-full w-full object-cover transition-transform duration-300 will-change-transform hover:scale-105 hover:cursor-pointer"
                             />
