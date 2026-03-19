@@ -19,3 +19,26 @@
         color-scheme: dark;
     }
 }
+
+@utility scroll-subtle {
+    /* Hides the buttons entirely */
+    &::-webkit-scrollbar-button {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    /* Optional: Styles the actual bar to be clean and modern */
+    &::-webkit-scrollbar {
+        height: 6px; /* Horizontal bar height */
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: color-mix(in srgb, var(--color-metadata) 20%, transparent);
+        border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+}
