@@ -5,7 +5,10 @@ import path from 'path'
 import axios from 'axios'
 import { createModuleLogger } from '@logger'
 import { getPlugin } from '@pluginSystem'
+import noCoverPath from '@assets/no_cover.svg?asset'
 const logger = createModuleLogger('Protocols')
+
+const noCover = fs.readFileSync(noCoverPath)
 
 export function setupTransekiProtocol() {
     logger.info('Setting up transeki:// protocol handler')
@@ -32,9 +35,9 @@ export function setupTransekiProtocol() {
             }
         } catch (error) {
             logger.error(`Transeki protocol error for "${req.url}": ${error.message}`)
-            return new Response('Image failed to load', {
+            return new Response(noCover, {
                 status: 404,
-                headers: { 'Content-Type': 'text/plain' }
+                headers: { 'Content-Type': 'image/svg+xml' }
             })
         }
     })
@@ -42,7 +45,11 @@ export function setupTransekiProtocol() {
 }
 
 function handleLocalIcon(targetUrl) {
-    if (targetUrl.startsWith('file://')) {
+    if (targetUrl === 'default_cover') {
+        return new Response(noCover, {
+            headers: { 'Content-Type': 'image/svg+xml' }
+        })
+    } else if (targetUrl.startsWith('file://')) {
         // Convert file:///C:/... to a proper Windows path
         const filePath = fileURLToPath(targetUrl)
         const fileData = fs.readFileSync(filePath)
