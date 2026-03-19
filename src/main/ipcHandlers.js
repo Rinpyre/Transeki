@@ -11,6 +11,7 @@ function serializePlugin(plugin) {
     return {
         id: plugin.info.id,
         name: plugin.info.name,
+        sourceUrl: plugin.info.sourceUrl,
         version: plugin.info.version,
         description: plugin.info.description,
         author: plugin.info.author,
