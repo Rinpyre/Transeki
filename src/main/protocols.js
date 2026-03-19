@@ -19,10 +19,18 @@ export function setupTransekiProtocol() {
             const route = url.hostname // The first segment after transeki:// is treated as the route
             const targetURL = url.searchParams.get('url') // The original URL is passed as a query parameter
             const pluginId = url.searchParams.get('plugin') // Optional plugin ID for context
-            logger.debug(`Received transeki:// request for route: ${route}, target: ${targetURL}`)
+            logger.debug(
+                `Received transeki:// request for route: ${route}, pluginId: ${pluginId}, targetURL: ${targetURL}`
+            )
 
             if (!targetURL) {
                 throw new Error('Missing target URL')
+            }
+
+            if (route === 'proxy' && !pluginId) {
+                logger.warn(
+                    `Proxy request for ${targetURL} is missing plugin context. This may cause issues with sites that require specific headers.`
+                )
             }
 
             switch (route) {
@@ -78,8 +86,7 @@ async function handleProxyRequest(targetUrl, pluginId) {
         let additionalHeaders = {}
         if (pluginId) {
             const plugin = getPlugin(pluginId)
-            if (plugin && plugin.info.name) {
-                logger.debug(`Proxying request for plugin [${plugin.info.name}] to ${targetUrl}`)
+            if (plugin) {
                 additionalHeaders = plugin.info.requestHeaders
             } else {
                 logger.warn(
