@@ -1,4 +1,5 @@
 export * from './MangaCard'
+export * from './SourceRow'
 export * from './SearchBar'
 export * from './RippleLoading'
 export * from './manga.schema'
