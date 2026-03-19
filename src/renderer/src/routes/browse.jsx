@@ -3,9 +3,9 @@ import { MangaPanel, MangaCard, SearchBar, SourceRow } from '@components'
 
 export const BrowsePage = () => {
     const [searched, setSearched] = useState(false)
-    const [searchState, setSearchState] = useState({}) // Stores { [sourceId]: { loading, results, error } }
+    const [searchState, setSearchState] = useState({})
     const [selectedManga, setSelectedManga] = useState({})
-    const [isPanelOpen, setIsPanelOpen] = useState(true)
+    const [isPanelOpen, setIsPanelOpen] = useState(false)
     const [isPanelLoading, setIsPanelLoading] = useState(false)
     const [sources, setSources] = useState([])
 
