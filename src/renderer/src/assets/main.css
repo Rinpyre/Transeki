@@ -42,3 +42,19 @@
         background: transparent;
     }
 }
+
+@utility scroll-none {
+    /* Hides the buttons entirely */
+    &::-webkit-scrollbar-button {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+
+    /* Hides the entire scrollbar */
+    &::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+}
