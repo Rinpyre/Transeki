@@ -1,6 +1,6 @@
 import { getProxyUrl } from '@utils'
 
-export const MangaCard = ({ manga, onClick }) => {
+export const MangaCard = ({ manga, sourceId, onClick }) => {
     return (
         <div
             className="manga-card group flex w-30 shrink-0 flex-col rounded-lg transition-all duration-300 will-change-transform hover:-translate-y-1 xl:w-40"
@@ -16,7 +16,7 @@ export const MangaCard = ({ manga, onClick }) => {
         >
             <div className="image aspect-2/3 overflow-hidden rounded-md hover:cursor-pointer">
                 <img
-                    src={getProxyUrl('proxy', manga.cover)}
+                    src={getProxyUrl('proxy', manga.cover, sourceId)}
                     alt={manga.title}
                     className="cover-image h-full w-full transition-transform duration-300"
                     draggable="false"
