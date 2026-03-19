@@ -69,15 +69,33 @@ export function registerIpcHandlers() {
     })
 
     // Plugin action IPC handlers
-    ipcMain.handle('plugin:search', (_, pluginId, query) =>
-        runPluginAction(pluginId, (plugin, modules) => plugin.actions.search(query, modules))
-    )
-    ipcMain.handle('plugin:get-manga', (_, pluginId, mangaId) =>
-        runPluginAction(pluginId, (plugin, modules) => plugin.actions.getManga(mangaId, modules))
-    )
-    ipcMain.handle('plugin:get-chapter', (_, pluginId, mangaId, chapterNum) =>
-        runPluginAction(pluginId, (plugin, modules) =>
-            plugin.actions.getChapter(mangaId, chapterNum, modules)
-        )
-    )
+    ipcMain.handle('plugin:search', async (_, pluginId, query) => {
+        try {
+            return await runPluginAction(pluginId, (plugin, modules) =>
+                plugin.actions.search(query, modules)
+            )
+        } catch (err) {
+            return { __ipcError: true, message: err.message || 'Failed to search' }
+        }
+    })
+
+    ipcMain.handle('plugin:get-manga', async (_, pluginId, mangaId) => {
+        try {
+            return await runPluginAction(pluginId, (plugin, modules) =>
+                plugin.actions.getManga(mangaId, modules)
+            )
+        } catch (err) {
+            return { __ipcError: true, message: err.message || 'Failed to get manga' }
+        }
+    })
+
+    ipcMain.handle('plugin:get-chapter', async (_, pluginId, mangaId, chapterNum) => {
+        try {
+            return await runPluginAction(pluginId, (plugin, modules) =>
+                plugin.actions.getChapter(mangaId, chapterNum, modules)
+            )
+        } catch (err) {
+            return { __ipcError: true, message: err.message || 'Failed to get chapter' }
+        }
+    })
 }

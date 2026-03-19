@@ -26,11 +26,26 @@ if (process.contextIsolated) {
         contextBridge.exposeInMainWorld('plugins', {
             getPlugins: () => ipcRenderer.invoke('plugins:get-all'),
             getPlugin: (id) => ipcRenderer.invoke('plugins:get-by-id', id),
-            search: (pluginId, query) => ipcRenderer.invoke('plugin:search', pluginId, query),
-            getManga: (pluginId, mangaId) =>
-                ipcRenderer.invoke('plugin:get-manga', pluginId, mangaId),
-            getChapter: (pluginId, mangaId, chapterNum) =>
-                ipcRenderer.invoke('plugin:get-chapter', pluginId, mangaId, chapterNum)
+            search: async (pluginId, query) => {
+                const res = await ipcRenderer.invoke('plugin:search', pluginId, query)
+                if (res && res.__ipcError) throw new Error(res.message)
+                return res
+            },
+            getManga: async (pluginId, mangaId) => {
+                const res = await ipcRenderer.invoke('plugin:get-manga', pluginId, mangaId)
+                if (res && res.__ipcError) throw new Error(res.message)
+                return res
+            },
+            getChapter: async (pluginId, mangaId, chapterNum) => {
+                const res = await ipcRenderer.invoke(
+                    'plugin:get-chapter',
+                    pluginId,
+                    mangaId,
+                    chapterNum
+                )
+                if (res && res.__ipcError) throw new Error(res.message)
+                return res
+            }
         })
         contextBridge.exposeInMainWorld('env', {
             isDev: process.env.NODE_ENV === 'development',
