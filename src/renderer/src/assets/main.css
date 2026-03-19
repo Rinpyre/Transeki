@@ -20,41 +20,41 @@
     }
 }
 
-@utility scroll-subtle {
-    /* Hides the buttons entirely */
+@utility scroll-base {
     &::-webkit-scrollbar-button {
         display: none !important;
         width: 0 !important;
         height: 0 !important;
     }
-
-    /* Optional: Styles the actual bar to be clean and modern */
     &::-webkit-scrollbar {
-        height: 6px; /* Horizontal bar height */
+        height: 6px; /* Horizontal */
+        width: 6px; /* Vertical */
     }
-
-    &::-webkit-scrollbar-thumb {
-        background-color: color-mix(in srgb, var(--color-metadata) 20%, transparent);
-        border-radius: 10px;
-    }
-
     &::-webkit-scrollbar-track {
         background: transparent;
     }
 }
 
-@utility scroll-none {
-    /* Hides the buttons entirely */
-    &::-webkit-scrollbar-button {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
+@utility scroll-subtle {
+    &::-webkit-scrollbar-thumb {
+        background-color: color-mix(in srgb, var(--color-metadata) 20%, transparent);
+        border-radius: 10px;
     }
+}
 
-    /* Hides the entire scrollbar */
+@utility scroll-onscroll {
+    &::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        border-radius: 10px;
+        transition: background-color 0.2s;
+    }
+    &:hover::-webkit-scrollbar-thumb {
+        background-color: color-mix(in srgb, var(--color-metadata) 20%, transparent);
+    }
+}
+
+@utility scroll-none {
     &::-webkit-scrollbar {
         display: none !important;
-        width: 0 !important;
-        height: 0 !important;
     }
 }
