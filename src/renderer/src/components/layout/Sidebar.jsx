@@ -25,7 +25,7 @@ export const Sidebar = () => {
     const typeCounts = {}
 
     return (
-        <nav className="sidebar bg-primary text-snow z-1 flex h-screen w-max flex-col py-2 shadow-xl shadow-black/30">
+        <nav className="sidebar text-snow z-1 flex h-screen w-max flex-col bg-transparent py-2">
             <ul className="top-nav flex h-full flex-col items-center gap-2">
                 {routes.map((route) => {
                     if (!typeCounts[route.type]) {
