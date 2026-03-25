@@ -9,7 +9,7 @@ function App() {
                 <Sidebar />
                 <div className="flex w-full grow items-center justify-center overflow-hidden">
                     <Routes>
-                        <Route path="/" element={<LibraryPage />} />
+                        <Route path="/library" element={<LibraryPage />} />
                         <Route path="/browse" element={<BrowsePage />} />
                         <Route path="*" element={<NotFoundPage />} />
                     </Routes>

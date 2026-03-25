@@ -65,7 +65,7 @@ export const BrowsePage = () => {
     }
 
     return (
-        <div className="browse-page scroll-none relative flex h-screen w-full flex-1 flex-col items-center overflow-hidden overflow-y-auto p-6">
+        <div className="browse-page scroll-none relative flex h-screen w-full grow flex-col items-center overflow-hidden overflow-y-auto p-6">
             <SearchBar onSearch={onSearch} className="mb-2 w-1/2! max-w-3xl min-w-85" />
             <MangaPanel
                 className="-translate-y-[46%]"
@@ -106,11 +106,9 @@ export const BrowsePage = () => {
                     })}
                 </div>
             ) : (
-                <div className="welcome-message text-snow mt-20 text-center">
-                    <h1 className="text-4xl font-bold">Welcome to Transeki!</h1>
-                    <p className="text-snow/70 mt-4 text-lg">
-                        Start by searching for a manga above.
-                    </p>
+                <div className="welcome-message text-snow mb-[5%] flex grow flex-col items-center justify-center gap-4">
+                    <h1 className="text-4xl font-bold">Need some manga inspiration?</h1>
+                    <p className="text-snow/70 text-lg">Start by searching for a manga above.</p>
                 </div>
             )}
         </div>

@@ -1,9 +1,10 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import {
-    BookSearch as Browse,
+    House as Home,
     LibraryBig as Library,
-    Settings,
-    UserRound as User
+    Search as Browse,
+    Bolt as Settings,
+    CircleUser as Account
 } from 'lucide-react'
 import { SidebarLink } from '@components'
 
@@ -12,21 +13,20 @@ export const Sidebar = () => {
     const location = useLocation()
 
     const routes = [
-        { type: 'page', path: '/', icon: Library, label: 'Library' },
-        { type: 'divider' },
+        { type: 'page', path: '/', icon: Home, label: 'Home' },
+        { type: 'page', path: '/library', icon: Library, label: 'Library' },
         { type: 'page', path: '/browse', icon: Browse, label: 'Browse' },
         { type: 'spacer' },
         { type: 'page', path: '/settings', icon: Settings, label: 'Settings' },
-        { type: 'divider' },
-        { type: 'page', path: '/profile', icon: User, label: 'Profile' }
+        { type: 'page', path: '/profile', icon: Account, label: 'Profile' }
     ]
 
     // Track type counts for generating semantic keys
     const typeCounts = {}
 
     return (
-        <nav className="sidebar bg-secondary text-snow z-1 flex h-screen w-max flex-col p-2 shadow-xl shadow-black/30">
-            <ul className="top-nav flex h-full flex-col items-center gap-1">
+        <nav className="sidebar bg-primary text-snow z-1 flex h-screen w-max flex-col py-2 shadow-xl shadow-black/30">
+            <ul className="top-nav flex h-full flex-col items-center gap-2">
                 {routes.map((route) => {
                     if (!typeCounts[route.type]) {
                         typeCounts[route.type] = 0
@@ -34,15 +34,6 @@ export const Sidebar = () => {
                     const typeKey = `${route.type}-${typeCounts[route.type]}`
                     typeCounts[route.type]++
 
-                    if (route.type === 'divider') {
-                        return (
-                            <div
-                                key={typeKey}
-                                id={typeKey}
-                                className="divider bg-border my-0.5 h-px w-3/4"
-                            ></div>
-                        )
-                    }
                     if (route.type === 'spacer') {
                         return <div key={typeKey} id={typeKey} className="spacer w-full grow" />
                     }

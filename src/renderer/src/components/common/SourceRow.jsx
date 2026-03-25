@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { getProxyUrl } from '@utils'
-import { Globe, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export const SourceRow = ({ source, children, className }) => {
     const scrollRef = useRef(null)
@@ -80,15 +80,12 @@ export const SourceRow = ({ source, children, className }) => {
                     <span className="text-snow">{source.name}</span>
                 </div>
                 <div className="spacer flex grow"></div>
-                <div className="actions flex items-center gap-2">
-                    <a // TODO: Replace with in-app WebView
-                        href={source.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-snow bg-secondary/50 hover:bg-tertiary hover:text-accent flex cursor-pointer items-center gap-1 rounded-md px-2 py-1 text-sm transition-colors duration-300"
+                <div className="actions text-metadata flex items-center gap-2">
+                    <a
+                        href="#"
+                        className="view-more hover:text-accent flex items-center gap-1 text-sm transition-colors duration-300"
                     >
-                        <Globe className="h-4 w-4" />
-                        <span className="hidden md:inline">WebView</span>
+                        View More
                     </a>
                 </div>
             </div>
@@ -110,7 +107,7 @@ export const SourceRow = ({ source, children, className }) => {
                     onMouseUp={onMouseUp}
                     onMouseMove={onMouseMove}
                     onClickCapture={onClickCapture}
-                    className={`results scroll-onscroll scroll-base flex w-full gap-2 overflow-x-auto py-2 ${
+                    className={`results scroll-none flex w-full gap-2 overflow-x-auto py-2 ${
                         isDragging ? 'cursor-grabbing select-none' : 'cursor-grab'
                     }`}
                 >
