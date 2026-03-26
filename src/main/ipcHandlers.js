@@ -89,10 +89,10 @@ export function registerIpcHandlers() {
         }
     })
 
-    ipcMain.handle('plugin:get-chapter', async (_, pluginId, mangaId, chapterNum) => {
+    ipcMain.handle('plugin:get-chapter', async (_, pluginId, mangaId, chapterId) => {
         try {
             return await runPluginAction(pluginId, (plugin, modules) =>
-                plugin.actions.getChapter(mangaId, chapterNum, modules)
+                plugin.actions.getChapter(mangaId, chapterId, modules)
             )
         } catch (err) {
             return { __ipcError: true, message: err.message || 'Failed to get chapter' }

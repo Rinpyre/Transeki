@@ -36,12 +36,12 @@ if (process.contextIsolated) {
                 if (res && res.__ipcError) throw new Error(res.message)
                 return res
             },
-            getChapter: async (pluginId, mangaId, chapterNum) => {
+            getChapter: async (pluginId, mangaId, chapterId) => {
                 const res = await ipcRenderer.invoke(
                     'plugin:get-chapter',
                     pluginId,
                     mangaId,
-                    chapterNum
+                    chapterId
                 )
                 if (res && res.__ipcError) throw new Error(res.message)
                 return res
