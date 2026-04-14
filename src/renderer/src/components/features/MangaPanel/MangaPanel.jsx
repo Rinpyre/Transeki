@@ -182,6 +182,7 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                                 name={chapter.title}
                                 date={chapter.releaseDate}
                                 read={chapter.read}
+                                scanlator={chapter.scanlator}
                             />
                         ))}
                     </div>
