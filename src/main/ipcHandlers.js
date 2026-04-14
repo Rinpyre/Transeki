@@ -98,4 +98,30 @@ export function registerIpcHandlers() {
             return { __ipcError: true, message: err.message || 'Failed to get chapter' }
         }
     })
+
+    ipcMain.handle('window-control:is-maximized', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        return window ? window.isMaximized() : false
+    })
+
+    // Window control handlers
+    ipcMain.on('window-control:minimize', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        if (window) window.minimize()
+    })
+
+    ipcMain.on('window-control:maximize', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        if (window) window.maximize()
+    })
+
+    ipcMain.on('window-control:restore', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        if (window) window.restore()
+    })
+
+    ipcMain.on('window-control:close', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        if (window) window.close()
+    })
 }

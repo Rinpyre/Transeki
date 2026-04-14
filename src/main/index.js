@@ -29,6 +29,7 @@ function createWindow() {
         show: false,
         icon: icon,
         ...(process.platform === 'linux' ? { icon } : {}),
+        ...(process.platform === 'win32' ? { frame: false } : {}),
         webPreferences: {
             preload: join(__dirname, '../preload/index.cjs'),
             sandbox: true,
@@ -39,6 +40,18 @@ function createWindow() {
 
     mainWindow.on('ready-to-show', () => {
         mainWindow.show()
+    })
+
+    mainWindow.on('maximize', () => {
+        if (!mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('window-control:maximized')
+        }
+    })
+
+    mainWindow.on('unmaximize', () => {
+        if (!mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('window-control:restored')
+        }
     })
 
     // Open external links in default browser
