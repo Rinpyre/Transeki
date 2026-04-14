@@ -1,3 +1,5 @@
 export * from './Sidebar'
 export * from './SidebarLink'
 export * from './MangaContainer'
+export * from './Titlebar'
+export * from './TitlebarItem'

@@ -1,6 +1,6 @@
 import { BookCheck as Read } from 'lucide-react'
 
-export const MPChapterItem = ({ name, date, read = false }) => {
+export const MPChapterItem = ({ name, date, scanlator, read = false }) => {
     return (
         <div
             className={`chapter-item hover:bg-primary/50 border-b-tertiary ${read ? 'opacity-60' : ''} flex cursor-pointer items-center justify-between border-b px-1 py-3 transition-colors`}
@@ -13,6 +13,7 @@ export const MPChapterItem = ({ name, date, read = false }) => {
                     className={`chapter-date text-sm ${read ? 'text-gray-600' : 'text-metadata'}`}
                 >
                     {date}
+                    {scanlator ? ` • ${scanlator}` : ''}
                 </span>
             </div>
             {read && (

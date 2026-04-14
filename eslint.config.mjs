@@ -26,7 +26,8 @@ export default [
             ...eslintPluginReactHooks.configs.recommended.rules,
             ...eslintPluginReactRefresh.configs.vite.rules,
             'react/prop-types': 'off',
-            'react/require-default-props': 'off'
+            'react/require-default-props': 'off',
+            'no-unused-vars': ['error', { varsIgnorePattern: '^_', argsIgnorePattern: '^_' }]
         }
     },
     eslintConfigPrettier

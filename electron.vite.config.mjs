@@ -8,6 +8,7 @@ export default defineConfig({
         resolve: {
             alias: {
                 '@': resolve('src/main'),
+                '@assets': resolve('src/main/assets'),
                 '@logger': resolve('src/main/logger.js'),
                 '@appData': resolve('src/main/appDataManager.js'),
                 '@pluginSystem': resolve('src/main/pluginSystem')

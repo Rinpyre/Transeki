@@ -11,6 +11,7 @@ function serializePlugin(plugin) {
     return {
         id: plugin.info.id,
         name: plugin.info.name,
+        sourceUrl: plugin.info.sourceUrl,
         version: plugin.info.version,
         description: plugin.info.description,
         author: plugin.info.author,
@@ -68,15 +69,59 @@ export function registerIpcHandlers() {
     })
 
     // Plugin action IPC handlers
-    ipcMain.handle('plugin:search', (_, pluginId, query) =>
-        runPluginAction(pluginId, (plugin, modules) => plugin.actions.search(query, modules))
-    )
-    ipcMain.handle('plugin:get-manga', (_, pluginId, mangaId) =>
-        runPluginAction(pluginId, (plugin, modules) => plugin.actions.getManga(mangaId, modules))
-    )
-    ipcMain.handle('plugin:get-chapter', (_, pluginId, mangaId, chapterNum) =>
-        runPluginAction(pluginId, (plugin, modules) =>
-            plugin.actions.getChapter(mangaId, chapterNum, modules)
-        )
-    )
+    ipcMain.handle('plugin:search', async (_, pluginId, query) => {
+        try {
+            return await runPluginAction(pluginId, (plugin, modules) =>
+                plugin.actions.search(query, modules)
+            )
+        } catch (err) {
+            return { __ipcError: true, message: err.message || 'Failed to search' }
+        }
+    })
+
+    ipcMain.handle('plugin:get-manga', async (_, pluginId, mangaId) => {
+        try {
+            return await runPluginAction(pluginId, (plugin, modules) =>
+                plugin.actions.getManga(mangaId, modules)
+            )
+        } catch (err) {
+            return { __ipcError: true, message: err.message || 'Failed to get manga' }
+        }
+    })
+
+    ipcMain.handle('plugin:get-chapter', async (_, pluginId, mangaId, chapterId) => {
+        try {
+            return await runPluginAction(pluginId, (plugin, modules) =>
+                plugin.actions.getChapter(mangaId, chapterId, modules)
+            )
+        } catch (err) {
+            return { __ipcError: true, message: err.message || 'Failed to get chapter' }
+        }
+    })
+
+    ipcMain.handle('window-control:is-maximized', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        return window ? window.isMaximized() : false
+    })
+
+    // Window control handlers
+    ipcMain.on('window-control:minimize', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        if (window) window.minimize()
+    })
+
+    ipcMain.on('window-control:maximize', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        if (window) window.maximize()
+    })
+
+    ipcMain.on('window-control:restore', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        if (window) window.restore()
+    })
+
+    ipcMain.on('window-control:close', (event) => {
+        const window = event.sender.getOwnerBrowserWindow()
+        if (window) window.close()
+    })
 }

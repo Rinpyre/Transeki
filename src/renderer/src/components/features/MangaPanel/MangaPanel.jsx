@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useLayoutEffect } from 'react'
 import {
     Heart as Favorite,
     RefreshCcw as Tracking,
@@ -15,28 +15,36 @@ import {
     MPMetadataItem,
     RippleLoading
 } from '@components'
+import { getProxyUrl } from '@utils'
 
 export const MangaPanel = ({ manga, onClose, open = false, loading = false, className = '' }) => {
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
     const [contentHeight, setContentHeight] = useState(0)
     const contentRef = useRef(null)
+    const prevMangaRef = useRef(null)
+    const maxDescriptionHeight = 116 // ~6 lines of text
+    const coverUrl = getProxyUrl('proxy', manga.cover, manga.sourceId)
+    const defaultCover = getProxyUrl('icon', 'default_cover')
 
-    const scrollableStyle = {
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none'
-    }
+    useLayoutEffect(() => {
+        // Only run when a NEW manga is loaded
+        if (contentRef.current && manga && manga !== prevMangaRef.current) {
+            const newHeight = contentRef.current.scrollHeight
+            setContentHeight(newHeight)
 
-    useEffect(() => {
-        if (contentRef.current) {
-            setContentHeight(contentRef.current.scrollHeight)
+            // Auto-expand only once, on first load of this manga
+            const shouldExpand = newHeight - maxDescriptionHeight < 100
+            setIsDescriptionExpanded(shouldExpand)
+
+            prevMangaRef.current = manga
         }
-    }, [isDescriptionExpanded])
+    }, [manga, maxDescriptionHeight])
 
     return (
         <div
             className={
                 `manga-panel bg-secondary fixed top-1/2 ${open ? 'right-6' : '-right-150'} z-2 h-9/12 w-[28%] min-w-88 -translate-y-1/2 overflow-visible rounded-xl pb-4 shadow-xl transition-all duration-300 ease-in-out` +
-                ` ${className}`
+                (className ? ` ${className}` : '')
             }
         >
             <button
@@ -51,34 +59,33 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
             </button>
             {loading && <RippleLoading />}
             <div
-                className={`manga-panel-content overflow-hidden rounded-xl ${!loading && 'overflow-y-scroll'} h-full w-full`}
-                style={scrollableStyle}
+                className={`manga-panel-content overflow-hidden rounded-xl ${!loading && 'overflow-y-scroll'} scroll-none h-full w-full`}
             >
                 <div className="info text-snow relative w-full">
                     <div
                         id="backdrop"
                         className="absolute -z-1 h-full w-full bg-cover bg-center bg-no-repeat opacity-10 blur-xs"
                         style={{
-                            backgroundImage: `url(${manga.cover})`
+                            backgroundImage: `url(${manga.cover ? coverUrl : ''})`
                         }}
                     ></div>
                     <div className="flex px-4 pt-4 pb-2">
-                        <div className="cover w-2/5 overflow-hidden rounded-md shadow-md">
+                        <div className="cover min-h-50 min-w-35 overflow-hidden rounded-md shadow-md">
                             <img
-                                src={manga.cover}
-                                alt={manga.title}
+                                src={manga.cover ? coverUrl : defaultCover}
+                                alt={manga.title ? `${manga.title} Cover` : 'Manga Cover'}
                                 className="h-full w-full object-cover transition-transform duration-300 will-change-transform hover:scale-105 hover:cursor-pointer"
                             />
                         </div>
                         <div className="flex w-full flex-col pl-4">
                             <h2 className="title line-clamp-3 text-2xl font-semibold text-ellipsis">
-                                {manga.title}
+                                {manga.title || 'Unknown Title'}
                             </h2>
                             <div className="spacer grow"></div>
                             <div className="metadata">
-                                <MPMetadataItem type="Status" value={manga.status} />
-                                <MPMetadataItem type="Author" value={manga.author} />
-                                <MPMetadataItem type="Source" value={manga.source} />
+                                <MPMetadataItem type="Status" value={manga.status || 'Unknown'} />
+                                <MPMetadataItem type="Author" value={manga.author || 'Unknown'} />
+                                <MPMetadataItem type="Source" value={manga.source || 'Unknown'} />
                             </div>
                         </div>
                     </div>
@@ -104,7 +111,11 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                 <div
                     className="additional-info text-snow relative flex flex-col gap-2 overflow-hidden px-4 transition-all duration-300"
                     ref={contentRef}
-                    style={{ maxHeight: isDescriptionExpanded ? `${contentHeight}px` : '116px' }}
+                    style={{
+                        maxHeight: isDescriptionExpanded
+                            ? `${contentHeight}px`
+                            : `${maxDescriptionHeight}px`
+                    }}
                     role="button"
                     tabIndex={0}
                     aria-expanded={isDescriptionExpanded}
@@ -118,11 +129,13 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                 >
                     <div className="description flex flex-col pb-2.5">
                         <h3 className="description-title text-metadata cursor-default text-lg font-semibold underline underline-offset-3">
-                            {manga.type} Description:
+                            {manga.type ? `${manga.type} Description` : 'Description'}
                         </h3>
-                        <p className="description-text mt-1 text-sm">{manga.description}</p>
+                        <p className="description-text mt-1 text-sm">
+                            {manga.description || 'No description available.'}
+                        </p>
                     </div>
-                    {contentHeight > 120 && (
+                    {contentHeight > maxDescriptionHeight && (
                         <button className="show-more absolute right-3 bottom-1 flex h-5 cursor-pointer px-1.5">
                             <span className="show-more-shadow from-secondary h-full w-10 bg-linear-to-l to-transparent"></span>
                             {isDescriptionExpanded ? (
@@ -145,7 +158,7 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                         </button>
                     )}
                     <div className="details-genres flex flex-wrap pb-7">
-                        {manga.genres.map((genre) => {
+                        {manga.genres?.map((genre) => {
                             const id = genre.toLowerCase().replace(/\s+/g, '-')
                             return <MPGenreBadge key={id} id={id} name={genre} />
                         })}
@@ -169,6 +182,7 @@ export const MangaPanel = ({ manga, onClose, open = false, loading = false, clas
                                 name={chapter.title}
                                 date={chapter.releaseDate}
                                 read={chapter.read}
+                                scanlator={chapter.scanlator}
                             />
                         ))}
                     </div>

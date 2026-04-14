@@ -1,12 +1,12 @@
 @import 'tailwindcss';
 
 @theme {
-    --color-primary: #101828; /* Ink Black - Background */
-    --color-secondary: #1d2939; /* Dark Blue Grey - Cards/Nav */
-    --color-tertiary: #2d3748; /* Blue Grey - Hover/Active States */
-    --color-border: #495366; /* Dark Grey Blue - Borders/Dividers */
+    --color-primary: #000000; /* Black - Background */
+    --color-secondary: #080808; /* Darker Black - Secondary Background/Containers */
+    --color-tertiary: #1e1e1e; /* Darker Grey - Hover/Active States */
+    --color-border: #495366; /* Grey Blue - Borders/Dividers */
     --color-snow: #fcf7f8; /* Snow - Primary Text */
-    --color-metadata: #98a2b3; /* Grey Blue - Secondary Text (Metadata: Author/Year) */
+    --color-metadata: #909090; /* Grey - Secondary Text/Metadata */
     --color-accent: #e60076; /* Pink - Accent (Buttons/Toggles) */
     --color-accent-light: #fb64b6; /* Pink - Hover */
     --color-accent-dark: #a0005a; /* Pink - Active */
@@ -17,5 +17,44 @@
 @layer base {
     :root {
         color-scheme: dark;
+    }
+}
+
+@utility scroll-base {
+    &::-webkit-scrollbar-button {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    &::-webkit-scrollbar {
+        height: 6px; /* Horizontal */
+        width: 6px; /* Vertical */
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+}
+
+@utility scroll-subtle {
+    &::-webkit-scrollbar-thumb {
+        background-color: color-mix(in srgb, var(--color-metadata) 20%, transparent);
+        border-radius: 10px;
+    }
+}
+
+@utility scroll-onscroll {
+    &::-webkit-scrollbar-thumb {
+        background-color: transparent;
+        border-radius: 10px;
+        transition: background-color 0.2s;
+    }
+    &:hover::-webkit-scrollbar-thumb {
+        background-color: color-mix(in srgb, var(--color-metadata) 20%, transparent);
+    }
+}
+
+@utility scroll-none {
+    &::-webkit-scrollbar {
+        display: none !important;
     }
 }

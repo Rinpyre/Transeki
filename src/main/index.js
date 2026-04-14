@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, Menu } from 'electron'
+import { app, shell, BrowserWindow, Menu, protocol } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
@@ -6,8 +6,21 @@ import { initializeAppData } from '@appData'
 import { initializePluginsFolder, loadPlugins } from '@pluginSystem'
 import { createModuleLogger } from '@logger'
 import { registerIpcHandlers } from './ipcHandlers.js'
+import { setupTransekiProtocol } from './protocols.js'
 
 const logger = createModuleLogger('Main')
+
+protocol.registerSchemesAsPrivileged([
+    {
+        scheme: 'transeki',
+        privileges: {
+            bypassCSP: true,
+            standard: true,
+            secure: true,
+            supportFetchAPI: true
+        }
+    }
+])
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -16,6 +29,7 @@ function createWindow() {
         show: false,
         icon: icon,
         ...(process.platform === 'linux' ? { icon } : {}),
+        ...(process.platform === 'win32' ? { frame: false } : {}),
         webPreferences: {
             preload: join(__dirname, '../preload/index.cjs'),
             sandbox: true,
@@ -26,6 +40,18 @@ function createWindow() {
 
     mainWindow.on('ready-to-show', () => {
         mainWindow.show()
+    })
+
+    mainWindow.on('maximize', () => {
+        if (!mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('window-control:maximized')
+        }
+    })
+
+    mainWindow.on('unmaximize', () => {
+        if (!mainWindow.isDestroyed()) {
+            mainWindow.webContents.send('window-control:restored')
+        }
     })
 
     // Open external links in default browser
@@ -81,6 +107,9 @@ app.whenReady().then(async () => {
         .catch((error) => {
             logger.error('Failed to load plugins:', error)
         })
+
+    // Setup custom protocols
+    setupTransekiProtocol()
 
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.
