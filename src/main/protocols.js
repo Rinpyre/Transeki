@@ -83,7 +83,7 @@ async function handleProxyRequest(url) {
     if (params.referer) headers['Referer'] = params.referer
     if (params.useUserAgent) headers['User-Agent'] = SCRAPER_USER_AGENT
 
-    // Let pluginAxios handle the Cloudflare magic and cookies!
+    //? Let pluginAxios handle the Cloudflare challenge if it occurs. If it does, the request will automatically retry after solving, and we don't need to do anything special here
     try {
         const response = await pluginAxios.get(params.url, {
             responseType: 'arraybuffer',
@@ -98,7 +98,7 @@ async function handleProxyRequest(url) {
     } catch (error) {
         logger.error(`Failed to fetch proxied image [${params.url}]: ${error.message}`)
 
-        // Instead of breaking the React UI, return the safe fallback SVG!
+        //? On failure (network error, CF block that couldn't be solved, non-image URL, etc), return the default "no cover" icon instead of an error response, so the UI can still show something.
         return handleLocalIcon(new URL(`transeki://icon?path=default_cover`))
     }
 }

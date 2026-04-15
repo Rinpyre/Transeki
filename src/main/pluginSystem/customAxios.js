@@ -4,12 +4,10 @@ import { createModuleLogger } from '@logger'
 
 const logger = createModuleLogger('PluginAxios')
 
-// The global state for cookies and our CF window lock
 export const cookieJar = {}
-// We use an object to store promises per-domain, so different extensions don't block each other!
 const cfSolvePromises = {}
 
-// Create the base instance
+// Create the base instance of Axios that plugins will use
 export const pluginAxios = axios.create({
     headers: { 'User-Agent': SCRAPER_USER_AGENT }
 })
@@ -56,20 +54,20 @@ pluginAxios.interceptors.response.use(
             }
         }
 
-        // We check the boolean we injected directly into the config!
+        // Check the boolean we injected directly into the config by our plugin manager to confirm if this request is from a CF-protected plugin
         if (isCfBlock && error.config && error.config.__cfProtected) {
             const pluginId = error.config.__pluginId
 
             // error.config.url might be a relative path, so we safely parse it using baseURL
             const targetUrl = new URL(error.config.url, error.config.baseURL)
-            const baseUrl = targetUrl.origin // Gives us 'https://mangafire.to'
-            const hostname = targetUrl.hostname // Gives us 'mangafire.to'
+            const baseUrl = targetUrl.origin
+            const hostname = targetUrl.hostname
 
             logger.warn(
                 `Cloudflare block detected for [${pluginId}] at ${baseUrl}. Attempting auto-solve...`
             )
 
-            // If no hidden window is currently solving CF FOR THIS SPECIFIC DOMAIN, start one
+            // If no hidden window is currently solving CF for this specific domain, start one
             if (!cfSolvePromises[hostname]) {
                 const tempScraper = createScraper(null, cookieJar)
                 cfSolvePromises[hostname] = tempScraper

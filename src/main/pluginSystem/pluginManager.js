@@ -53,11 +53,11 @@ function createPluginModules(plugin, signal = null) {
     const injectConfig = (config = {}) => ({
         ...config,
         signal,
-        __pluginId: pluginId, // Keep this ONLY for pretty logging!
-        __cfProtected: plugin.info.cf_protected // Direct boolean! No registry lookup needed!
+        __pluginId: pluginId,
+        __cfProtected: plugin.info.cf_protected
     })
 
-    // We pass a wrapped version of Axios so the plugin developer doesn't have
+    // Pass a wrapped version of Axios so the plugin developer doesn't have
     // to worry about manually passing signals or plugin IDs.
     const axiosWrapper = {
         request: (config) => pluginAxios.request(injectConfig(config)),

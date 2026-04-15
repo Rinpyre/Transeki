@@ -3,7 +3,7 @@ import { createModuleLogger } from '@logger'
 
 const logger = createModuleLogger('Scraper')
 
-// We force a standard browser User-Agent so Cloudflare doesn't immediately flag Electron
+//? Use standard browser User-Agent so Cloudflare doesn't immediately flag Electron
 export const SCRAPER_USER_AGENT =
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
@@ -20,14 +20,13 @@ export function createScraper(signal, cookieJar) {
             return new Promise((resolve, reject) => {
                 const cleanup = () => {
                     if (win && !win.isDestroyed()) {
-                        // Must check if webContents exists before touching the session!
                         if (win.webContents && !win.webContents.isDestroyed()) {
                             win.webContents.session.webRequest.onBeforeRequest(null)
                         }
                         win.destroy()
                         logger.debug('Scraper window destroyed and cleaned up.')
                     }
-                    win = null // Always nullify to prevent memory leaks
+                    win = null //! Always nullify to prevent memory leaks
                 }
 
                 // Respect the IPC Timeout AbortSignal
@@ -39,14 +38,14 @@ export function createScraper(signal, cookieJar) {
                     })
                 }
 
-                // MODE: Intercept a generated URL (e.g., the vrf token)
+                // Intercept a requested URL pattern if provided (used for dynamic token extraction in some plugins)
                 if (interceptPattern) {
                     logger.info(`Setting up intercept pattern: ${interceptPattern}`)
                     win.webContents.session.webRequest.onBeforeRequest(
                         { urls: [interceptPattern] },
                         (details, callback) => {
                             logger.info(`Intercepted matching URL: ${details.url}`)
-                            callback({ cancel: true }) // Prevent actual loading to save bandwidth
+                            callback({ cancel: true }) //! Prevent actual loading to save bandwidth
                             cleanup()
                             resolve({ interceptedUrl: details.url })
                         }
@@ -72,7 +71,7 @@ export function createScraper(signal, cookieJar) {
                         }
                     }
 
-                    // MODE: Wait for Cloudflare to clear
+                    // If the plugin is waiting for a Cloudflare challenge to be solved, we repeatedly check the page title for signs of success.
                     if (waitForCf) {
                         try {
                             const title = await win.webContents.executeJavaScript('document.title')
