@@ -20,11 +20,14 @@ export function createScraper(signal, cookieJar) {
             return new Promise((resolve, reject) => {
                 const cleanup = () => {
                     if (win && !win.isDestroyed()) {
-                        win.webContents.session.webRequest.onBeforeRequest(null)
+                        // Must check if webContents exists before touching the session!
+                        if (win.webContents && !win.webContents.isDestroyed()) {
+                            win.webContents.session.webRequest.onBeforeRequest(null)
+                        }
                         win.destroy()
-                        win = null
                         logger.debug('Scraper window destroyed and cleaned up.')
                     }
+                    win = null // Always nullify to prevent memory leaks
                 }
 
                 // Respect the IPC Timeout AbortSignal
