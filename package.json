@@ -22,6 +22,7 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@fluentui/react-icons": "^2.0.324",
     "axios": "^1.13.2",
+    "cheerio": "^1.2.0",
     "lucide-react": "^0.562.0",
     "react-router-dom": "^7.12.0",
     "winston": "^3.19.0",

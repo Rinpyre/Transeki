@@ -11,6 +11,7 @@ import {
 import { pathToFileURL } from 'url'
 import { pluginAxios, cookieJar } from './customAxios.js'
 import { createScraper } from './scraper.js'
+import * as cheerio from 'cheerio'
 
 const logger = createModuleLogger('Plugins')
 
@@ -96,7 +97,8 @@ function createPluginModules(plugin, signal = null) {
         signal,
         scraper: createScraper(signal, cookieJar),
         proxyImage,
-        logger: pluginLogger
+        logger: pluginLogger,
+        cheerio
     }
 }
 
