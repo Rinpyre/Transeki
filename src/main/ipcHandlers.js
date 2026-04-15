@@ -40,7 +40,7 @@ async function runPluginAction(pluginId, actionFn) {
         // Promise.race: if actionFn wins, finally runs clearTimeout before the timer ever fires.
         // If timeout wins, the abort signal has already been sent to cancel network requests.
         return await Promise.race([
-            actionFn(plugin, createPluginModules(controller.signal)),
+            actionFn(plugin, createPluginModules(plugin, controller.signal)),
             timeoutPromise
         ])
     } catch (err) {

@@ -2,7 +2,6 @@ import { getFolderPath } from '@appData'
 import { createModuleLogger } from '@logger'
 import { join } from 'path'
 import { mkdir, stat, readdir, readFile } from 'fs/promises'
-import axios from 'axios'
 import {
     isValidPluginDirectoryName,
     validateManifest,
@@ -10,6 +9,8 @@ import {
     validatePluginExports
 } from '@pluginSystem'
 import { pathToFileURL } from 'url'
+import { pluginAxios, cookieJar } from './customAxios.js'
+import { createScraper } from './scraper.js'
 
 const logger = createModuleLogger('Plugins')
 
@@ -44,8 +45,47 @@ function createPlugin(data) {
 //
 // `signal` is an AbortSignal — pass it to axios: axios.get(url, { signal })
 // This enables true cancellation when a timeout fires or the user navigates away.
-function createPluginModules(signal = null) {
-    return { axios, signal }
+function createPluginModules(plugin, signal = null) {
+    const pluginId = plugin.info.id
+
+    // Helper to silently inject the plugin ID and AbortSignal into the axios config
+    const injectConfig = (config = {}) => ({
+        ...config,
+        signal,
+        __pluginId: pluginId, // Keep this ONLY for pretty logging!
+        __cfProtected: plugin.info.cf_protected // Direct boolean! No registry lookup needed!
+    })
+
+    // We pass a wrapped version of Axios so the plugin developer doesn't have
+    // to worry about manually passing signals or plugin IDs.
+    const axiosWrapper = {
+        request: (config) => pluginAxios.request(injectConfig(config)),
+        get: (url, config) => pluginAxios.get(url, injectConfig(config)),
+        post: (url, data, config) => pluginAxios.post(url, data, injectConfig(config)),
+        put: (url, data, config) => pluginAxios.put(url, data, injectConfig(config)),
+        delete: (url, config) => pluginAxios.delete(url, injectConfig(config))
+    }
+
+    // Image proxy builder
+    const proxyImage = (imageUrl, options = {}) => {
+        //? Even if no security needed, proxying is done to solve no-cover issues
+        const payload = JSON.stringify({
+            url: imageUrl,
+            referer: options.referer || null,
+            useUserAgent: options.useUserAgent || false,
+            useCf: options.useCf || false,
+            pluginId: plugin.info.id //! Should never be null if useCf is true
+        })
+
+        return `transeki://proxy/${Buffer.from(payload).toString('base64')}`
+    }
+
+    return {
+        axios: axiosWrapper,
+        signal,
+        scraper: createScraper(signal, cookieJar),
+        proxyImage
+    }
 }
 
 // --- Registry accessors ---
@@ -215,9 +255,10 @@ async function loadSinglePlugin(pluginDir, pluginsPath) {
 
     // Assemble plugin object
     const iconPath = iconFileName ? pathToFileURL(join(pluginPath, iconFileName)).href : null
+    const protocolIconUrl = iconPath ? `transeki://icon/?path=${iconPath}` : null
     const plugin = createPlugin({
         info: manifest,
-        icon: iconPath,
+        icon: protocolIconUrl,
         actions: pluginExports
     })
 

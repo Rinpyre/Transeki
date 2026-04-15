@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from 'react'
-import { getProxyUrl } from '@utils'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export const SourceRow = ({ source, children, className }) => {
@@ -72,7 +71,7 @@ export const SourceRow = ({ source, children, className }) => {
                 <div className="info flex items-center gap-2">
                     {source.icon && (
                         <img
-                            src={getProxyUrl('icon', source.icon)}
+                            src={source.icon}
                             alt={`${source.name} icon`}
                             className="h-6 w-6 rounded-sm object-cover"
                         />

@@ -92,7 +92,6 @@ export const BrowsePage = () => {
                                         <MangaCard
                                             key={manga.id}
                                             manga={manga}
-                                            sourceId={source.id}
                                             onClick={() =>
                                                 handleMangaCardClick(manga.id, source.id)
                                             }

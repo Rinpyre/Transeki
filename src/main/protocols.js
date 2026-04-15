@@ -2,13 +2,11 @@ import { protocol } from 'electron'
 import { fileURLToPath } from 'url'
 import fs from 'fs'
 import path from 'path'
-import axios from 'axios'
+import { pluginAxios } from './pluginSystem/customAxios.js'
+import { SCRAPER_USER_AGENT } from './pluginSystem/scraper.js'
 import { createModuleLogger } from '@logger'
-import { getPlugin } from '@pluginSystem'
 import noCoverPath from '@assets/no_cover.svg?asset'
 const logger = createModuleLogger('Protocols')
-
-const noCover = fs.readFileSync(noCoverPath)
 
 export function setupTransekiProtocol() {
     logger.info('Setting up transeki:// protocol handler')
@@ -17,49 +15,40 @@ export function setupTransekiProtocol() {
         try {
             const url = new URL(req.url)
             const route = url.hostname // The first segment after transeki:// is treated as the route
-            const targetURL = url.searchParams.get('url') // The original URL is passed as a query parameter
-            const pluginId = url.searchParams.get('plugin') // Optional plugin ID for context
-            logger.debug(
-                `Received transeki:// request for route: ${route}, pluginId: ${pluginId}, targetURL: ${targetURL}`
-            )
 
-            if (!targetURL) {
-                throw new Error('Missing target URL')
-            }
-
-            if (route === 'proxy' && !pluginId) {
-                logger.warn(
-                    `Proxy request for ${targetURL} is missing plugin context. This may cause issues with sites that require specific headers.`
-                )
-            }
+            logger.debug(`Received transeki:// request for route: ${route}`)
 
             switch (route) {
                 case 'icon':
-                    return handleLocalIcon(targetURL)
+                    return handleLocalIcon(url)
                 case 'proxy':
-                    return await handleProxyRequest(targetURL, pluginId)
+                    return await handleProxyRequest(url)
                 default:
                     throw new Error(`Unknown route ${route}`)
             }
         } catch (error) {
             logger.error(`Transeki protocol error for "${req.url}": ${error.message}`)
-            return new Response(noCover, {
-                status: 404,
-                headers: { 'Content-Type': 'image/svg+xml' }
-            })
+            return new Response(`Error: ${error.message}`, { status: 500 })
         }
     })
     logger.info('transeki:// protocol handler registered successfully')
 }
 
-function handleLocalIcon(targetUrl) {
-    if (targetUrl === 'default_cover') {
-        return new Response(noCover, {
+function handleLocalIcon(url) {
+    const targetPath = url.searchParams.get('path')
+
+    // "No cover" fallback
+    if (targetPath === 'default_cover') {
+        const fileData = fs.readFileSync(noCoverPath)
+        return new Response(fileData, {
             headers: { 'Content-Type': 'image/svg+xml' }
         })
-    } else if (targetUrl.startsWith('file://')) {
+    }
+
+    // Plusin icons from the hard drive
+    if (targetPath.startsWith('file://')) {
         // Convert file:///C:/... to a proper Windows path
-        const filePath = fileURLToPath(targetUrl)
+        const filePath = fileURLToPath(targetPath)
         const fileData = fs.readFileSync(filePath)
 
         // Guess mime type so SVGs render correctly
@@ -77,37 +66,39 @@ function handleLocalIcon(targetUrl) {
             headers: { 'Content-Type': contentType }
         })
     } else {
-        throw new Error(`Invalid local icon URL: ${targetUrl}`)
+        throw new Error(`Invalid local icon path: ${targetPath}`)
     }
 }
 
-async function handleProxyRequest(targetUrl, pluginId) {
-    if (targetUrl.startsWith('http')) {
-        let additionalHeaders = {}
-        if (pluginId) {
-            const plugin = getPlugin(pluginId)
-            if (plugin) {
-                additionalHeaders = plugin.info.requestHeaders
-            } else {
-                logger.warn(
-                    `Plugin with ID ${pluginId} not found for proxy request to ${targetUrl}`
-                )
-            }
-        }
-        const response = await axios.get(targetUrl, {
+async function handleProxyRequest(url) {
+    // The URL looks like: transeki://proxy/eyJ1cmwiOi... (Base64 payload)
+    const base64Data = url.pathname.substring(1) // Remove the leading '/'
+    const params = JSON.parse(Buffer.from(base64Data, 'base64').toString('utf-8'))
+
+    if (!params.url || !params.pluginId) {
+        return handleLocalIcon(new URL(`transeki://icon?path=default_cover`)) // Return default cover on error
+    }
+
+    const headers = {}
+    if (params.referer) headers['Referer'] = params.referer
+    if (params.useUserAgent) headers['User-Agent'] = SCRAPER_USER_AGENT
+
+    // Let pluginAxios handle the Cloudflare magic and cookies!
+    try {
+        const response = await pluginAxios.get(params.url, {
             responseType: 'arraybuffer',
-            headers: {
-                'User-Agent':
-                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                ...additionalHeaders
-            }
+            headers,
+            __pluginId: params.pluginId,
+            __cfProtected: params.useCf
         })
 
         return new Response(response.data, {
-            // Dynamically use the header MangaDex sends us
             headers: { 'Content-Type': response.headers['content-type'] }
         })
-    } else {
-        throw new Error(`Invalid proxy URL: ${targetUrl}`)
+    } catch (error) {
+        logger.error(`Failed to fetch proxied image [${params.url}]: ${error.message}`)
+
+        // Instead of breaking the React UI, return the safe fallback SVG!
+        return handleLocalIcon(new URL(`transeki://icon?path=default_cover`))
     }
 }
