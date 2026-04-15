@@ -80,11 +80,23 @@ function createPluginModules(plugin, signal = null) {
         return `transeki://proxy/${Buffer.from(payload).toString('base64')}`
     }
 
+    const baseLogger = createModuleLogger(plugin.info.name || plugin.info.id)
+    const pluginLogger = {
+        info: (msg, ...args) => baseLogger.info(msg, ...args),
+        warn: (msg, ...args) => baseLogger.warn(msg, ...args),
+        error: (msg, ...args) => baseLogger.error(msg, ...args),
+        debug: (msg, ...args) => baseLogger.debug(msg, ...args),
+
+        //! If a dev accidentally types logger.log(), silently convert it to an info log so it doesn't crash Winston!
+        log: (msg, ...args) => baseLogger.info(msg, ...args)
+    }
+
     return {
         axios: axiosWrapper,
         signal,
         scraper: createScraper(signal, cookieJar),
-        proxyImage
+        proxyImage,
+        logger: pluginLogger
     }
 }
 
