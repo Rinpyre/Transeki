@@ -29,8 +29,32 @@ pluginAxios.interceptors.request.use((config) => {
 pluginAxios.interceptors.response.use(
     (response) => response, // Request succeeded normally
     async (error) => {
-        const isCfBlock =
-            error.response && (error.response.status === 403 || error.response.status === 503)
+        let isCfBlock = false
+
+        if (error.response && (error.response.status === 403 || error.response.status === 503)) {
+            let dataStr = ''
+
+            if (error.response.data instanceof ArrayBuffer) {
+                dataStr = Buffer.from(error.response.data).toString('utf8')
+            } else if (typeof error.response.data === 'string') {
+                dataStr = error.response.data
+            } else if (typeof error.response.data === 'object') {
+                dataStr = JSON.stringify(error.response.data)
+            }
+
+            // Check for the exact title tags injected by Cloudflare's challenge firewall
+            const isCfTitle =
+                dataStr.includes('<title>Just a moment...</title>') ||
+                dataStr.includes('<title>Attention Required!')
+
+            if (isCfTitle) {
+                isCfBlock = true
+            } else {
+                logger.warn(
+                    `API returned ${error.response.status}, but it was a server error, NOT Cloudflare.`
+                )
+            }
+        }
 
         // We check the boolean we injected directly into the config!
         if (isCfBlock && error.config && error.config.__cfProtected) {
