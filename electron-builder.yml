@@ -1,11 +1,5 @@
 appId: com.rinpyre.transeki
 productName: Transeki
-productDescription: 'Transeki is a feature-rich manga reader desktop application designed for seamless browsing and reading of manga collections. Enjoy an intuitive interface optimized for desktop environments.'
-categories:
-  - Comics
-  - Reading
-  - Entertainment
-  - Utility
 copyright: 'Copyright © 2026 Rinpyre'
 directories:
   buildResources: build
