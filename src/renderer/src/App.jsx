@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { HashRouter, Routes, Route } from 'react-router-dom'
 import { Sidebar, Titlebar } from '@components'
 import { BrowsePage, LibraryPage, NotFoundPage } from '@routes'
 
@@ -6,7 +6,7 @@ function App() {
     const isWindows = window.env.platform === 'win32'
 
     return (
-        <BrowserRouter>
+        <HashRouter>
             <div className="app bg-primary flex h-screen w-full">
                 <Sidebar />
                 {isWindows && <Titlebar />}
@@ -18,7 +18,7 @@ function App() {
                     </Routes>
                 </div>
             </div>
-        </BrowserRouter>
+        </HashRouter>
     )
 }
 
