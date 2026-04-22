@@ -1,13 +1,13 @@
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export const NotFoundPage = () => {
     const navigate = useNavigate()
-    const location = window.location.pathname
+    const location = useLocation()
 
     return (
         <div className="flex h-screen w-full flex-col items-center justify-center">
             <h1 className="text-4xl font-bold">404</h1>
-            <p className="mt-2 text-lg text-gray-400">Page `{location}` not found.</p>
+            <p className="mt-2 text-lg text-gray-400">Page `{location.pathname}` not found.</p>
             <div className="mt-6 max-w-md text-center">
                 <p className="text-sm text-gray-500">
                     This application is currently in active development. Some pages may not be
