@@ -119,6 +119,13 @@ function getPluginIds() {
 // --- Core loading ---
 
 function getPluginsFolderPath() {
+    const CUSTOM_PLUGIN_FOLDER_PATH = process.env.PLUGIN_FOLDER_PATH
+    if (CUSTOM_PLUGIN_FOLDER_PATH) {
+        logger.info(
+            `Using custom plugin folder path from environment variable: ${CUSTOM_PLUGIN_FOLDER_PATH}`
+        )
+        return CUSTOM_PLUGIN_FOLDER_PATH
+    }
     return getFolderPath('plugins')
 }
 

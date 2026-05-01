@@ -2,13 +2,14 @@ import { app, shell, BrowserWindow, Menu, protocol } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.ico?asset'
-import { initializeAppData } from '@appData'
+import { initializeAppData, getFolderPath } from '@appData'
 import { initializePluginsFolder, loadPlugins } from '@pluginSystem'
 import { createModuleLogger } from '@logger'
 import { registerIpcHandlers } from './ipcHandlers.js'
 import { setupTransekiProtocol } from './protocols.js'
 
 const logger = createModuleLogger('Main')
+const settings = require(getFolderPath('settings') + '/settings.json')
 
 protocol.registerSchemesAsPrivileged([
     {
@@ -79,6 +80,8 @@ app.whenReady().then(async () => {
 
     // Completely disable the application menu
     Menu.setApplicationMenu(null)
+
+    process.env.PLUGIN_FOLDER_PATH = settings.customPluginsPath || null
 
     // Initialize appdata directory structure
     await initializeAppData().catch((error) => {
